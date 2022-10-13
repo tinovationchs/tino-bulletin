@@ -1,0 +1,10 @@
+{
+  "firebase": {
+    "apiKey": "AIzaSyBxMctOCASemLGb1DeIzVjsBsqCDYML5WY",
+    "authDomain": "tino-bulletin-test.firebaseapp.com",
+    "projectId": "tino-bulletin-test",
+    "storageBucket": "tino-bulletin-test.appspot.com",
+    "messagingSenderId": "415432448045",
+    "appId": "1:415432448045:web:bdbbf21133cd41471340a4"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "users": {
+    "email": {
+      //the same decodedClaims.name
+      "name": "",
+      "created_posts": [post ids...],
+      ...
+    }
+  },
+  "posts": {
+    "id": {
+      "author": string,
+      "timestamp": int,
+      "content": string,
+      //if not approved (approved is false), do not display post
+      "approved": bool
+    }
+  }
+}

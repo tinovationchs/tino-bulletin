@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>Main Page</title>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+  </head>
+  <body>
+    <div id="firebaseui-auth-container"></div>
+    <script>
+      //https://firebase.google.com/docs/auth/web/firebaseui
+      fetch('/config.json').then((result) => {
+        return result.json();
+      }).then((config) => {
+        config = config.firebase;
+
+        firebase.initializeApp(config);
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        ui.start('#firebaseui-auth-container', {
+          callbacks: {
+            signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+              authResult.user.getIdToken().then(async (idtoken) => {
+                console.log(idtoken)
+                await fetch("/sessionLogin", {
+                  method: "POST",
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  body: `{
+                    "idToken": "`+idtoken+`"
+                  }`,
+                });
+                window.location.href = "/test";
+              })
+              /*
+              console.log(authResult)
+              //window.location.href = '/sessionLogin?idToken=' + authResult.credential.idToken;
+              console.log(authResult.user)
+              //.credential.idToken is truncated, and so is invalid!!!! it took me 2.5 hours to figure this out :))))))
+              console.log(authResult.credential.idToken.length)
+              */
+              //we are redirecting to /test ourselves
+              return false;
+            },
+          },
+
+          //signInSuccessUrl: "/test",
+
+          signInOptions: [
+            // List of OAuth providers supported.
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          ]
+        });
+      });
+    </script>
+  </body>
+</html>
