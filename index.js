@@ -1,32 +1,67 @@
 const express = require("express");
-const db = require('./db.js');
+const db = require("./db.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  return res.sendFile("index.html", { root: __dirname+"/serve" });
-});
+const port = 8000;
 
-app.post('/sessionLogin', async (req, res) => {
-  await db.setCookie(req, res);
-});
+app.set('view engine', 'ejs');
 
-app.get('/sessionLogout', (req, res) => {
-  res.clearCookie('session');
-  res.redirect('/');
-});
-
-app.get("/test", db.auth, (req, res) => {
-  return res.sendFile("test.html", { root: __dirname+"/serve" });
+app.get("/login", (req, res) => {
+    res.render("login.ejs");
 });
 
 app.get("/config.json", (req, res) => {
-  return res.sendFile("config.json", { root: __dirname+"/serve" });
+    return res.sendFile("config.json", { root: __dirname+"/serve" });
 });
 
-app.listen(8080, function() {
-  console.log("Running");
+app.get("/", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+    console.log("from .get('/'), user: ", user);
+
+    const posts = await db.getPosts();
+    console.log("from .get('/'), posts: ", posts);
+
+    res.render("index.ejs", { 
+        user: user,
+        posts: posts,
+    });
+})
+
+app.post("/sessionLogin", async (req, res) => {
+    console.log("Login Request received");
+    await db.setSessionCookie(req, res);
+});
+
+app.get("/sessionLogout", (req, res) => {
+    res.clearCookie('session');
+    res.redirect('/login');
+});
+app.get("/createPost", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+    console.log("from .get('/'), user: ", user);
+
+    res.render("createPost.ejs", { 
+        user: user,
+    });
+});
+app.post("/publishPost", db.auth, (req, res) => {
+    console.log("Publish Post requested, body: ", req.body);
+    const post = req.body;
+
+    // If no post in body
+    if (post === undefined) 
+        return;
+
+    // Push post
+    db.pushPost(post);
+
+    res.redirect('/');
+});
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
 });

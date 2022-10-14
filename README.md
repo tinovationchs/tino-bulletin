@@ -1,9 +1,12 @@
 Language: Node.js
+Template Renderer: EJS
 
 Packages to install:
 - express
 - cookie-parser
 - firebase-admin
+- EJS
+- dotenv
 
 Environmental variables:
 - credentials

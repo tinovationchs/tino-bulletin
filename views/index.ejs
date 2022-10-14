@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1> Tino Bulletin Board! </h1>
+
+        <p><%- user.name %></p> 
+        <a href="/sessionLogout">Log out</a> <br>
+        
+        <a href="/createPost"> Create Post </a> 
+
+        <h2> Posts: </h2>
+        <% posts.forEach((post) => { %>
+            <%- include('./component/postView.ejs', {post: post}) %>
+        <% }); %>
+
+        <script>
+        </script>
+    </body>
+</html>

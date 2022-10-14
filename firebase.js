@@ -1,6 +1,7 @@
 const firebase = require("firebase-admin");
-//const auth = require("firebase-admin/auth");
-//process.env is how we access environmental variables (a way to keep certain things secret). we do not want to hardcode it obviously
+require('dotenv').config();
+
+//"dotenv" is how we access environmental variables (a way to keep certain things secret)
 
 firebase.initializeApp({
   credential: firebase.credential.cert(JSON.parse(process.env.credentials)),

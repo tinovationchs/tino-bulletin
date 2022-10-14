@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1> Tino Bulletin Board! </h1>
+
+        <p><%- user.name %></p> 
+        <a href="/sessionLogout">Log out</a> <br>
+        
+        <h1> Make Post: </h1>
+        
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="text"><br>
+        <label for="text">Text:</label><br>
+        <input type="text" id="text" name="text"><br><br>
+        <button id="publishPost" onclick="publishPost()"> Post </button>
+
+        <script>
+            async function publishPost () {
+                const post = {}
+                post.title = document.getElementById("title").value;
+                post.text = document.getElementById("text").value;
+
+                await fetch('/publishPost', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(post)
+                });
+                window.href = '/';
+            }
+        </script>
+    </body>
+</html>
