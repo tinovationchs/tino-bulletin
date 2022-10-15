@@ -40,6 +40,7 @@ app.get("/sessionLogout", (req, res) => {
     res.clearCookie('session');
     res.redirect('/login');
 });
+
 app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     console.log("from .get('/'), user: ", user);
@@ -48,6 +49,7 @@ app.get("/createPost", db.auth, async (req, res) => {
         user: user,
     });
 });
+
 app.post("/publishPost", db.auth, (req, res) => {
     console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
@@ -62,6 +64,11 @@ app.post("/publishPost", db.auth, (req, res) => {
     res.redirect('/');
 });
 
+app.get("/api/posts", db.auth, async (req, res) => {
+  const posts = await db.getPosts();
+  return res.json(posts);
+});
+
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`App listening on port ${port}`)
 });
