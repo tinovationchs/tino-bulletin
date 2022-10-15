@@ -80,12 +80,20 @@ async function getSessionClaims(req) {
 }
 
 function pushPost(post) {
-    post.postTime = new Date().valueOf();
+    let newPost = {title: post.title, text: post.text, postTime: new Date().valueOf()};
+
+    //todo: add "approved": false flag by default
+
+    if (!newPost.title || !newPost.text) {
+        return;
+    }
+
+    console.log(newPost)
 
     console.log("Pushed post: ", post);
 
-    postsRef.push(post);
-} 
+    postsRef.push(newPost);
+}
 
 async function getUserFromClaims (claims) {
     if (claims == undefined) {

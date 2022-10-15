@@ -20,7 +20,7 @@
                 post.title = document.getElementById("title").value;
                 post.text = document.getElementById("text").value;
 
-                await fetch('/publishPost', {
+                await fetch('/api/posts/publish', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

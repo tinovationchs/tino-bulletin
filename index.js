@@ -50,7 +50,7 @@ app.get("/createPost", db.auth, async (req, res) => {
     });
 });
 
-app.post("/publishPost", db.auth, (req, res) => {
+app.post("/api/posts/publish", db.auth, (req, res) => {
     console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
 
@@ -64,9 +64,9 @@ app.post("/publishPost", db.auth, (req, res) => {
     res.redirect('/');
 });
 
-app.get("/api/posts", db.auth, async (req, res) => {
-  const posts = await db.getPosts();
-  return res.json(posts);
+app.get("/api/posts/view", db.auth, async (req, res) => {
+    const posts = await db.getPosts();
+    return res.json(posts);
 });
 
 app.listen(port, () => {
