@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
     <body>
-        <h1> Tino Bulletin Board! </h1>
-
-        <p><%- user.name %></p> 
-        <a href="/sessionLogout">Log out</a> <br>
+        <%- include('./component/titlebar.ejs', {user : user}) %>
         
         <a href="/createPost"> Create Post </a> 
 

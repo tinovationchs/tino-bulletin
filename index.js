@@ -3,12 +3,14 @@ const db = require("./db.js");
 const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
-
 const port = 4242;
 
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static('public'));
 app.set('view engine', 'ejs');
+
+
 
 app.get("/login", (req, res) => {
     res.render("login.ejs");
