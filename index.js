@@ -6,14 +6,8 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const port = 8000;
+const port = 4242;
 
-
-/*
-    Hello World from 'shine' branch!.
-    Testing 123.
-    Testing 123.
-*/
 app.set('view engine', 'ejs');
 
 app.get("/login", (req, res) => {
@@ -35,7 +29,16 @@ app.get("/", db.auth, async (req, res) => {
         user: user,
         posts: posts,
     });
-})
+});
+
+app.get("/admin", db.auth, async (req, res) => {
+    
+    //Check admin perms
+    const user = await db.getUser(req);
+    if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
+
+    res.render("admin.ejs");
+});
 
 app.post("/sessionLogin", async (req, res) => {
     console.log("Login Request received");
@@ -49,11 +52,26 @@ app.get("/sessionLogout", (req, res) => {
 
 app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    console.log("from .get('/'), user: ", user);
+    const categories = await db.getCategories();
 
     res.render("createPost.ejs", { 
         user: user,
+        categories: categories,
     });
+});
+
+app.post('/api/createCategory', db.auth, async (req, res) => {
+    console.log("Publish Post requested, body: ", req.body);
+    const post = req.body;
+
+    //Check admin perms
+    const user = await db.getUser(req);
+    if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
+
+    //Instruct db to create new category 
+    db.createCategory(req);
+
+    res.redirect('/');
 });
 
 app.post("/api/posts/publish", db.auth, async (req, res) => {
