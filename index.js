@@ -8,7 +8,6 @@ app.use(cookieParser());
 
 const port = 8000;
 
-
 /*
     Hello World from 'shine' branch!.
     Testing 123.
@@ -28,12 +27,18 @@ app.get("/", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     console.log("from .get('/'), user: ", user);
 
-    const posts = await db.getPosts();
+    let posts = await db.getPosts();
+
+    //exclude unapproved posts
+    posts = posts.filter(function(item) {
+        return item.approved;
+    });
     console.log("from .get('/'), posts: ", posts);
 
     res.render("index.ejs", { 
         user: user,
         posts: posts,
+        admin_view: false
     });
 })
 
@@ -78,6 +83,39 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
 app.get("/api/posts/view", db.auth, async (req, res) => {
     const posts = await db.getPosts();
     return res.json(posts);
+});
+
+app.get("/admin", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+
+    if (!user.admin) {
+        return res.redirect('/');
+    }
+    
+    const posts = await db.getPosts();
+
+    res.render("index.ejs", { 
+        user: user,
+        posts: posts,
+        admin_view: true
+    });
+});
+
+app.post("/api/posts/approve", db.auth, async (req, res) => {
+    //vulernable to attacks probably. fix later. probably check origin of requests
+    const user = await db.getUser(req);
+
+    console.log(user.admin)
+
+    if (!user.admin) {
+        return res.redirect('/');
+    }
+
+    let post_content = req.body;
+
+    await db.approvePost(post_content);
+
+    return res.send("SUCCESS");
 });
 
 app.listen(port, () => {

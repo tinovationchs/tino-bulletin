@@ -48,6 +48,7 @@ async function setSessionCookie(req, res) {
                 const newUser = {
                     "email": email,
                     "name": claims.name,
+                    "admin": false
                 };
                 usersRef.push( newUser );
             }
@@ -71,7 +72,7 @@ async function getSessionClaims(req) {
         undefined;
     
     // Fetch Session claims 
-    try { 
+    try {
         return firebase.auth().verifySessionCookie(session_cookie, true);
     } catch (error) {
         console.log(error);
@@ -80,7 +81,7 @@ async function getSessionClaims(req) {
 }
 
 function pushPost(post) {
-    let newPost = {title: post.title, text: post.text, author: post.author, authorName: post.authorName, postTime: new Date().valueOf()};
+    let newPost = {title: post.title, text: post.text, author: post.author, authorName: post.authorName, postTime: new Date().valueOf(), approved: false};
 
     //todo: add "approved": false flag by default
 
@@ -93,6 +94,19 @@ function pushPost(post) {
     console.log("Pushed post: ", post);
 
     postsRef.push(newPost);
+}
+
+async function approvePost(post_content) {
+    console.log("approving post", post_content)
+    postsRef.once("value", function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            if (JSON.stringify(childSnapshot.val()) === JSON.stringify(post_content)) {
+                let new_post_content = childSnapshot.val();
+                new_post_content.approved = true;
+                childSnapshot.ref.update(new_post_content);
+            }
+        });
+    });
 }
 
 async function getUserFromClaims(claims) {
@@ -146,4 +160,5 @@ module.exports = {
     pushPost: pushPost,
     getUser: getUser,
     getPosts: getPosts,
+    approvePost: approvePost,
 }
