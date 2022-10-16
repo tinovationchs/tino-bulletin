@@ -50,12 +50,17 @@ app.get("/createPost", db.auth, async (req, res) => {
     });
 });
 
-app.post("/api/posts/publish", db.auth, (req, res) => {
+app.post("/api/posts/publish", db.auth, async (req, res) => {
     console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
 
+    let made_user = await db.getUser(req);
+
+    post.authorName = made_user.name;
+    post.author = made_user.email;
+
     // If no post in body
-    if (post === undefined) 
+    if (post === undefined)
         return;
 
     // Push post

@@ -80,7 +80,7 @@ async function getSessionClaims(req) {
 }
 
 function pushPost(post) {
-    let newPost = {title: post.title, text: post.text, postTime: new Date().valueOf()};
+    let newPost = {title: post.title, text: post.text, author: post.author, authorName: post.authorName, postTime: new Date().valueOf()};
 
     //todo: add "approved": false flag by default
 
@@ -95,7 +95,7 @@ function pushPost(post) {
     postsRef.push(newPost);
 }
 
-async function getUserFromClaims (claims) {
+async function getUserFromClaims(claims) {
     if (claims == undefined) {
         console.log("Got undefined claims at 'getUserFromClaims'");
         return undefined;
@@ -115,11 +115,13 @@ async function getUserFromClaims (claims) {
         })
     );
 }
+
 async function getUser(req) {
     if (req === undefined) return undefined;
     
     return getUserFromClaims(await getSessionClaims(req));
 }
+
 // Fetches a list of posts.
 // NOTE: Draft function, later revisions may use an actual algorithm to tailor the posts
 //  to the user.

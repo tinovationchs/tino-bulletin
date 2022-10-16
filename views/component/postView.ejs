@@ -1,2 +1,3 @@
 <h3><%= post.title %></h3>
+<span>By <%= post.authorName %> | <%= (new Date(post.postTime)).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %></span>
 <p><%= post.text %></p>
