@@ -4,16 +4,31 @@
         <h1> Tino Bulletin Board! </h1>
 
         <p><%- user.name %></p> 
-        <a href="/sessionLogout">Log out</a> <br>
+        <a href="/sessionLogout">Log out</a><br>
         
-        <a href="/createPost"> Create Post </a> 
+        <a href="/createPost"> Create Post</a><br>
+
+        <% if (user.admin && !admin_view) { %>
+            <a href="/admin"> Admin </a><br>
+            <a href="/mod"> Approve Posts </a>
+        <% } %>
 
         <h2> Posts: </h2>
         <% posts.forEach((post) => { %>
-            <%- include('./component/postView.ejs', {post: post}) %>
+            <%- include('./component/postView.ejs', {post: post, admin_view: admin_view}) %>
         <% }); %>
 
         <script>
-        </script>
+            async function approvePost(post) {
+                await fetch('/api/posts/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(post)
+                });
+            }
+    </script>
     </body>
 </html>
