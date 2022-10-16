@@ -46,6 +46,23 @@ app.get("/admin", db.auth, async (req, res) => {
     res.render("admin.ejs");
 });
 
+app.get("/mod", db.auth, async (req, res) => {
+    let posts = await db.getPosts();
+    //Check admin perms
+    const user = await db.getUser(req);
+    if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
+
+    posts = posts.filter(function(item) {
+        return !item.approved;
+    });
+
+    res.render("index.ejs", { 
+        user: user,
+        posts: posts,
+        admin_view: true
+    });
+});
+
 app.post("/sessionLogin", async (req, res) => {
     console.log("Login Request received");
     await db.setSessionCookie(req, res);
