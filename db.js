@@ -1,8 +1,10 @@
+const { CategoryChannel } = require("discord.js");
 const firebase = require("./firebase.js");
 
 const db = firebase.database();
 const usersRef = db.ref('users');
 const postsRef = db.ref('posts');
+const categoriesRef = db.ref('categories');
 
 // Middleware. Checks if a session cookie corresponding to a user exists.
 // Redirects to '/login' if none is found.
@@ -57,7 +59,7 @@ async function setSessionCookie(req, res) {
     } catch (e) {
         console.log("ERROR ON COOKIE SET, ", e)
         //if it throws an error, that means the token is invalid
-        res.status(401).send('UNAUTHORIZED REQUEST!');
+        res.status(403).send('UNAUTHORIZED REQUEST!');
     }
 }
 
@@ -80,17 +82,40 @@ async function getSessionClaims(req) {
     }
 }
 
-function pushPost(post) {
-    let newPost = {title: post.title, text: post.text, author: post.author, authorName: post.authorName, postTime: new Date().valueOf(), approved: false};
+function createCategory (req) {
+    const newCat = req.body.newCategoryName;
+    let pair = {};
+    pair[newCat] = true;
+
+    categoriesRef.update(pair);
+}
+
+async function getCategories () {
+    const snapshot = await categoriesRef.once('value')
+    let categories = [];
+    snapshot.forEach((data) => {
+        categories.push( data.key );        
+    })
+    return categories;
+}
+
+function pushPost (post) {
+    let newPost = {
+        title: post.title, 
+        text: post.text, 
+        author: post.author, 
+        authorName: post.authorName, 
+        postTime: new Date().valueOf(),
+        category: post.category,
+        approved: false
+    };
 
     //todo: add "approved": false flag by default
 
     if (!newPost.title || !newPost.text) {
         return;
     }
-
     console.log(newPost)
-
     console.log("Pushed post: ", post);
 
     postsRef.push(newPost);
@@ -147,7 +172,7 @@ function getPosts() {
             snapshot.forEach((data) => {
                 posts.push( data.val());        
             })
-            return posts;
+            return posts.reverse();
         }).catch((error) => {
             return undefined;
         })
@@ -160,5 +185,7 @@ module.exports = {
     pushPost: pushPost,
     getUser: getUser,
     getPosts: getPosts,
+    createCategory: createCategory,
+    getCategories: getCategories,
     approvePost: approvePost,
 }

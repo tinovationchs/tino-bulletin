@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <label for="category">Text:</label><br>
+        <input type="text" id="category" name="category"><br>
+        <button onclick="createCategory()">Create Category</button>
+
+        <script>
+            async function createCategory () {
+                const body = {
+                    newCategoryName: document.getElementById("category").value,
+                };
+
+                await fetch('/api/createCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+            }
+        </script>
+    </body>
+</html>
