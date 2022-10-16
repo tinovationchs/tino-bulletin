@@ -12,13 +12,23 @@
         <input type="text" id="title" name="text"><br>
         <label for="text">Text:</label><br>
         <input type="text" id="text" name="text"><br><br>
+
+        <label for="category">Category:</label>
+        <select id="category" name="category"> 
+            <% categories.forEach(category => { %>
+                <option value=<%= category %>> <%= category %> </option>
+            <% }); %>
+        </select><br>
+        
         <button id="publishPost" onclick="publishPost()"> Post </button>
 
+            
         <script>
             async function publishPost () {
                 const post = {}
                 post.title = document.getElementById("title").value;
                 post.text = document.getElementById("text").value;
+                post.category = document.getElementById("category").value;
 
                 await fetch('/api/posts/publish', {
                     method: 'POST',
