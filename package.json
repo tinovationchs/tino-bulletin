@@ -4,11 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ignore-path .gitignore ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.25.0"
+  },
   "dependencies": {
     "@types/node": "^18.0.6",
     "cookie-parser": "^1.4.6",
