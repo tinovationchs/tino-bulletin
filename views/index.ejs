@@ -4,8 +4,11 @@
         <link href="style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <%- include('./component/titlebar.ejs', {user : user}) %>
-        
+        <h1> Tino Bulletin Board! </h1>
+
+        <p><%- user.name %></p> 
+        <a href="/sessionLogout">Log out</a><br>
+                
         <a href="/createPost"> Create Post </a> 
 
         <h2> Posts: </h2>
