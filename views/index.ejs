@@ -6,7 +6,7 @@
     <body>
         <%- include('./component/titlebar.ejs', {user : user}) %>
         
-        <a href="/createPost"> Create Post </a><br>
+        <a href="/createPost"> Create Post</a><br>
 
         <% if (user.admin && !admin_view) { %>
             <a href="/admin"> Admin </a><br>
