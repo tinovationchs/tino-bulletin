@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
     <body>
+        <%- include('./component/titlebar.ejs', {user : user}) %>
         <a href="/createPost"> Create Post</a><br>
 
         <% if (user.admin && !admin_view) { %>
