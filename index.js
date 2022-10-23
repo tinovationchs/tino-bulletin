@@ -24,7 +24,7 @@ app.get("/", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     console.log("from .get('/'), user: ", user);
 
-    let posts = await db.getPosts();
+    let posts = await db.getPostsForUser(user);
 
     //exclude unapproved posts
     posts = posts.filter(function(item) {
@@ -97,7 +97,7 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
     }
 
     console.log('user requested to add new category', newCategory);
-    db.addCategoryToUser(req, newCategory);
+    db.addCategory(req, newCategory);
 });
 
 app.post("/sessionLogin", async (req, res) => {
@@ -154,10 +154,10 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
 });
 
 app.get("/api/posts/view", db.auth, async (req, res) => {
-    let categories = req.query.category;
+    let category = req.query.category
     let amount = Number(req.query.amount);
     let offset = Number(req.query.offset);
-    const posts = await db.getPosts(categories, amount, offset);
+    const posts = await db.getPosts(category, amount, offset);
     return res.json(posts);
 });
 

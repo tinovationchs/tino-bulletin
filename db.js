@@ -185,11 +185,10 @@ function getPosts(category, amount, offset) {
         offset = 0;
     }
 
-    console.log(offset+amount)
-
+    console.log("requested query for category: %s, request quantity: %d", category, offset+amount);
     if (category) {
-        //.orderByChild('email').equalTo(email
-        return         postsRef.orderByChild('category').equalTo(category).limitToLast(offset+amount).once("value")
+        return (
+            postsRef.orderByChild('category').equalTo(category).limitToLast(offset+amount).once("value")
             .then((snapshot) => {
                 let posts = [];
                 snapshot.forEach((data) => {
@@ -202,8 +201,9 @@ function getPosts(category, amount, offset) {
             }).catch((error) => {
                 return undefined;
             })
+        );
     }
-    return(
+    return (
         postsRef.orderByChild('postTime').limitToLast(offset+amount).once("value")
         .then((snapshot) => {
             let posts = [];
@@ -216,6 +216,21 @@ function getPosts(category, amount, offset) {
         })
     )
 }
+// Gets posts of categories configured by the user.
+// Draft function.
+async function getPostsForUser(user) {
+    let categories = Object.keys(user.categories).map(category => category);
+    
+    const posts = [];
+    for (const category of categories) {
+        let amount = 2;
+        const categoryPosts = await getPosts(category, amount);
+        posts.push(...categoryPosts);
+    };
+    return posts;
+}
+
+// Gets posts where the author is the specified user
 function getPostsByUser(user) {
     return(
         postsRef.orderByChild('author').equalTo(user.email).once("value")
@@ -230,6 +245,7 @@ function getPostsByUser(user) {
         })
     )
 }
+// Adds a category to the user's category list. 
 async function addCategory (req, newCategory) {
     const user = await getUser(req);
 
@@ -249,9 +265,9 @@ module.exports = {
     // Queries
     getUser: getUser,
     getUserByEmail: getUserByEmail,
-    getPosts: getPosts,
     getPostsByUser: getPostsByUser,
     addCategory: addCategory,
+    getPostsForUser: getPostsForUser,
 
     // DB setting & modifying 
     pushPost: pushPost,
