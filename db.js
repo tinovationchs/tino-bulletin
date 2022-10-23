@@ -157,22 +157,55 @@ async function getUserFromClaims(claims) {
 
 async function getUser(req) {
     if (req === undefined) return undefined;
-    
-    return getUserFromClaims(await getSessionClaims(req));
+    try {
+        return getUserFromClaims(await getSessionClaims(req));
+    } catch {
+        return undefined;
+    }
 }
 
 // Fetches a list of posts.
 // NOTE: Draft function, later revisions may use an actual algorithm to tailor the posts
 //  to the user.
-function getPosts() {
+function getPosts(category, amount, offset) {
+    if (!amount) {
+        amount = 2;
+    }
+
+    if (amount > 25) {
+        amount = 25;
+    }
+
+    if (!offset) {
+        offset = 0;
+    }
+
+    console.log(offset+amount)
+
+    if (category) {
+        //.orderByChild('email').equalTo(email
+        return         postsRef.orderByChild('category').equalTo(category).limitToLast(offset+amount).once("value")
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach((data) => {
+                    posts.push( data.val());        
+                });
+                posts.sort(function(a, b) {
+                   return b.postTime - a.postTime 
+                });
+                return posts.slice(offset);
+            }).catch((error) => {
+                return undefined;
+            })
+    }
     return(
-        postsRef.orderByChild('postTime').limitToLast(2).once("value")
+        postsRef.orderByChild('postTime').limitToLast(offset+amount).once("value")
         .then((snapshot) => {
             let posts = [];
             snapshot.forEach((data) => {
                 posts.push( data.val());        
             })
-            return posts.reverse();
+            return posts.reverse().slice(offset);
         }).catch((error) => {
             return undefined;
         })
