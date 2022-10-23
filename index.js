@@ -65,6 +65,41 @@ app.get("/mod", db.auth, async (req, res) => {
     });
 });
 
+app.get("/profile/:userEmail", async (req, res) => {
+    const user = await db.getUser(req);
+    
+    // Get profile being viewed
+    console.log('queried user profile, userEmail: ', req.params.userEmail);
+    const profile = await db.getUserByEmail(req.params.userEmail);
+    if (profile === undefined) return res.status(404).send('None such user.');
+    
+    // Get posts by user
+    const posts = await db.getPostsByUser(user);
+
+    // Check if it is self (profile edit will only be allowed if so)
+
+    res.render("profile.ejs", {
+        user: user,
+        profile: profile,
+        posts: posts,
+    });
+});
+
+app.post("/api/profile/addCategory", db.auth, async (req, res) => {
+    const newCategory = req.body.newCategory;
+    if (newCategory === undefined) return;
+
+    // Check if category exists
+    if ((await db.getCategories()).indexOf(newCategory) == -1) {
+        // Alert user
+        res.send({error: 'none such category'});
+        return;
+    }
+
+    console.log('user requested to add new category', newCategory);
+    db.addCategoryToUser(req, newCategory);
+});
+
 app.post("/sessionLogin", async (req, res) => {
     console.log("Login Request received");
     await db.setSessionCookie(req, res);
