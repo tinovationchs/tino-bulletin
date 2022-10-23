@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <%- include('./component/titlebar.ejs', {user : user}) %>
+        <a href="/createPost"> Profile </a><br>
+
+        <h2><%= profile.name %></h2>
+        <p><%= profile.email %></p>
+        
+        <% if (profile.admin) { %>
+            <p> ADMIN </p>
+        <% } %>
+
+        <%# Profile editing for categories. %>
+        <% if (profile.email = user.email) { %>
+            <label for="category">Add New Category: </label>
+            <input name="category" id="category-input"></input>
+            <button id="category-add">Add</button>
+
+            <h2> Categories: </h2>
+            <lu>
+                <% for (const category in profile.categories) { %>
+                    <li><%= category %></li>
+                <% } %>
+            </lu>
+        <% } %>
+
+        <h2> Posts: </h2>
+        <% posts.forEach((post) => { %>
+            <%- include('./component/postView.ejs', {post: post, admin_view: false}) %>
+        <% }); %>
+
+
+        <%# Script for profile editing. %>
+        <% if (profile.email = user.email) { %>
+            <script>    
+                document.getElementById('category-add').onclick = async () => {
+                    const body = {
+                        newCategory: document.getElementById('category-input').value,
+                    };
+
+                    const response = await (await fetch('/api/profile/addCategory', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    })).json();   
+                    if (response.error !== undefined) 
+                        alert(response.error);         
+                }
+            </script>
+        <% } %>
+    </body>
+</html>

@@ -50,7 +50,8 @@ async function setSessionCookie(req, res) {
                 const newUser = {
                     "email": email,
                     "name": claims.name,
-                    "admin": false
+                    "admin": false,
+                    "categories": {"annoucements": true},
                 };
                 usersRef.push( newUser );
             }
@@ -141,7 +142,12 @@ async function getUserFromClaims(claims) {
     }
     const email = claims.email;
 
-    // Query user, if none such user exists, push entry to db
+    // Query user by email
+    return getUserByEmail(email);
+}
+
+async function getUserByEmail(email) {
+    // Query user by email
     return ( 
         usersRef.orderByChild('email').equalTo(email).limitToLast(1).once("value")
         .then((snapshot) => {
@@ -153,12 +159,14 @@ async function getUserFromClaims(claims) {
             return undefined;
         })
     );
-}
+} 
 
 async function getUser(req) {
-    if (req === undefined) return undefined;
-    
-    return getUserFromClaims(await getSessionClaims(req));
+    try {
+        return getUserFromClaims(await getSessionClaims(req));
+    } catch (error) {
+        return undefined;
+    }
 }
 
 // Fetches a list of posts.
@@ -178,13 +186,45 @@ function getPosts() {
         })
     )
 }
+function getPostsByUser(user) {
+    return(
+        postsRef.orderByChild('author').equalTo(user.email).once("value")
+        .then((snapshot) => {
+            let posts = [];
+            snapshot.forEach((data) => {
+                posts.push( data.val() );        
+            })
+            return posts.reverse();
+        }).catch((error) => {
+            return undefined;
+        })
+    )
+}
+async function addCategory (req, newCategory) {
+    const user = await getUser(req);
 
+    // Get snapshot referencing user, edit values, then update.
+    usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", function(snapshot) {
+        const val = snapshot.val();
+        const userID = Object.keys(val)[0];
+        val[userID].categories[newCategory] = true;
+        snapshot.ref.update(val);
+    });
+}
 module.exports = {
+    // Session & Authentications
     auth: auth,
     setSessionCookie: setSessionCookie,
-    pushPost: pushPost,
+
+    // Queries
     getUser: getUser,
+    getUserByEmail: getUserByEmail,
     getPosts: getPosts,
+    getPostsByUser: getPostsByUser,
+    addCategory: addCategory,
+
+    // DB setting & modifying 
+    pushPost: pushPost,
     createCategory: createCategory,
     getCategories: getCategories,
     approvePost: approvePost,
