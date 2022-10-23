@@ -154,7 +154,10 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
 });
 
 app.get("/api/posts/view", db.auth, async (req, res) => {
-    const posts = await db.getPosts();
+    let categories = req.query.category;
+    let amount = Number(req.query.amount);
+    let offset = Number(req.query.offset);
+    const posts = await db.getPosts(categories, amount, offset);
     return res.json(posts);
 });
 
@@ -167,7 +170,7 @@ app.get("/admin", db.auth, async (req, res) => {
     
     const posts = await db.getPosts();
 
-    res.render("index.ejs", { 
+    res.render("index.ejs", {
         user: user,
         posts: posts,
         admin_view: true
