@@ -51,7 +51,9 @@
                         body: JSON.stringify(body)
                     })).json();   
                     if (response.error !== undefined) 
-                        alert(response.error);         
+                        alert(response.error);   
+                    document.getElementById('category-add').value = "";
+                    window.location.reload();
                 }
             </script>
         <% } %>
