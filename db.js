@@ -250,9 +250,10 @@ async function addCategory (req, newCategory) {
     const user = await getUser(req);
 
     // Get snapshot referencing user, edit values, then update.
-    usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", function(snapshot) {
+    await usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", function(snapshot) {
         const val = snapshot.val();
         const userID = Object.keys(val)[0];
+        if (val[userID].categories == undefined) val[userID].categories = {};
         val[userID].categories[newCategory] = true;
         snapshot.ref.update(val);
     });

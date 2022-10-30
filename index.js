@@ -45,7 +45,7 @@ app.get("/admin", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
-    res.render("admin.ejs");
+    res.render("admin.ejs", {user: user});
 });
 
 app.get("/mod", db.auth, async (req, res) => {
@@ -76,12 +76,17 @@ app.get("/profile/:userEmail", async (req, res) => {
     // Get posts by user
     const posts = await db.getPostsByUser(user);
 
+    // Get categories available to add. 
+    const categories = await db.getCategories();
+    const newCategories = 
+        profile.categories != undefined ? categories.filter( category => !(category in profile.categories) ) : categories; 
+    
     // Check if it is self (profile edit will only be allowed if so)
-
     res.render("profile.ejs", {
         user: user,
         profile: profile,
         posts: posts,
+        categories: newCategories, 
     });
 });
 
@@ -97,7 +102,10 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
     }
 
     console.log('user requested to add new category', newCategory);
-    db.addCategory(req, newCategory);
+    await db.addCategory(req, newCategory);
+    
+    res.status(200);
+    res.json({});
 });
 
 app.post("/sessionLogin", async (req, res) => {
@@ -109,7 +117,6 @@ app.get("/sessionLogout", (req, res) => {
     res.clearCookie('session');
     res.redirect('/login');
 });
-
 app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const categories = await db.getCategories();
