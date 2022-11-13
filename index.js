@@ -145,10 +145,10 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
     console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
 
-    let made_user = await db.getUser(req);
+    let author = await db.getUser(req);
 
-    post.authorName = made_user.name;
-    post.author = made_user.email;
+    post.authorName = author.name;
+    post.author = author.email;
 
     // If no post in body
     if (post === undefined)
