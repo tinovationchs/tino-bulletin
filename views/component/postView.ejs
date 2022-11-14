@@ -3,7 +3,18 @@
     <h4>category: <%= post.category%></h4>
     <span>By  <a href="/profile/<%= post.author %>" style="text-decoration: none"><%= post.authorName %></a> | <%= (new Date(post.postTime)).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %></span>
     <p><%= post.text %></p>
-    <% if (admin_view) { %>
+    <% if (admin_view && post.attachments) { %>
+        <% post.attachments.forEach(function(attachment) { %>
+            <p><%= attachment %></p>
+        <% }); %>
         <button onclick="approvePost(<%= JSON.stringify(post) %>)">Approve Post</button>
+    <% } else if (post.attachments) { %>
+        <% post.attachments.forEach(function(attachment) { %>
+            <% if (attachment.endsWith('.png') || attachment.endsWith('.jpg')) { %>
+                <img src="<%= attachment %>"/>
+            <% } else { %>
+                <p><%= attachment %></p>
+            <% } %>
+        <% }); %>
     <% } %>
 </div>
