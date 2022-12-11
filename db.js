@@ -22,7 +22,7 @@ async function auth(req, res, next) {
 // If new user (not in db), push to db.
 async function setSessionCookie(req, res) {
     try {
-        console.log("Cookie Set Requested");
+        //console.log("Cookie Set Requested");
 
         const idToken = req.body.idToken.toString();
         // Set session expiration to 5 days.
@@ -133,8 +133,8 @@ function pushPost (post) {
     if (!newPost.title || !newPost.text) {
         return;
     }
-    console.log(newPost)
-    console.log("Pushed post: ", post);
+    //console.log(newPost)
+    //console.log("Pushed post: ", post);
 
     postsRef.push(newPost);
 }
@@ -223,7 +223,7 @@ function getPosts(category, amount, offset) {
         offset = 0;
     }
 
-    console.log("requested query for category: %s, request quantity: %d", category, offset+amount);
+    //console.log("requested query for category: %s, request quantity: %d", category, offset+amount);
     if (category) {
         return (
             postsRef.orderByChild('category').equalTo(category).limitToLast(offset+amount).once("value")
@@ -305,6 +305,7 @@ module.exports = {
     getUnapprovedPosts: getUnapprovedPosts,
     getUser: getUser,
     getUserByEmail: getUserByEmail,
+
     getPostsByUser: getPostsByUser,
     addCategory: addCategory,
     getPostsForUser: getPostsForUser,

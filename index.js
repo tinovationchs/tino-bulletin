@@ -50,7 +50,7 @@ app.get("/admin", db.auth, async (req, res) => {
 
 app.get("/mod", db.auth, async (req, res) => {
     //Check admin perms
-    const user = await db.getUser(req);
+	const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
     console.log("Mod authorized. on '/mod' GET.");

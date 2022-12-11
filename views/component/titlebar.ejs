@@ -1,10 +1,7 @@
-<div class="navbar"> 
-    <div style="left: 10px; bottom: 10px; position: absolute; "> 
-        <a href="/" style="text-decoration:none"> <div style="font-size: 24px">Tino Bulletin Web</div> </a>
+<div class="navbar bg-light"> 
+    <div class = "container-fluid" style="left: 10px; bottom: 10px;"> 
+        <a class = "navbar-brand" href="/">Tino Bulletin</a>
         <div style="font-size: 14px; color: #444">A fun place where students post about school events~</div>
-    </div>
-
-    <div style="right: 10px; bottom: 10px; position: absolute; font-size: 16px; display:flex"> 
         
         <% if (user !== undefined) { %>
             <a href="/profile/<%= user.email %>" style="text-decoration:none" >
@@ -14,6 +11,6 @@
         <% } else { %>
             <a href="/login">Login</a>
         <% } %> 
-        | <a href="/sessionLogout">Logout</a>
+        <a href="/sessionLogout">Logout</a>
     </div>
 </div>
