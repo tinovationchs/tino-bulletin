@@ -22,7 +22,7 @@ app.get("/config.json", (req, res) => {
 
 app.get("/", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    console.log("from .get('/'), user: ", user);
+    //console.log("from .get('/'), user: ", user);
 
     let posts = await db.getPostsForUser(user);
 
@@ -30,7 +30,7 @@ app.get("/", db.auth, async (req, res) => {
     posts = posts.filter(function(item) {
         return item.approved;
     });
-    console.log("from .get('/'), posts: ", posts);
+    //console.log("from .get('/'), posts: ", posts);
 
     res.render("index.ejs", { 
         user: user,
@@ -53,9 +53,10 @@ app.get("/mod", db.auth, async (req, res) => {
 	const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
-	let posts = await db.getPosts().filter(function(item) {
-        return !item.approved;
-    });
+    console.log("Mod authorized. on '/mod' GET.");
+    let posts = await db.getUnapprovedPosts()
+    
+    console.log("posts: ", posts);
 
     res.render("index.ejs", { 
         user: user,
@@ -68,12 +69,12 @@ app.get("/profile/:userEmail", async (req, res) => {
     const user = await db.getUser(req);
     
     // Get profile being viewed
-    console.log('queried user profile, userEmail: ', req.params.userEmail);
+    //console.log('queried user profile, userEmail: ', req.params.userEmail);
     const profile = await db.getUserByEmail(req.params.userEmail);
     if (profile === undefined) return res.status(404).send('None such user.');
     
     // Get posts by user
-    const posts = await db.getPostsByUser(user);
+    const posts = await db.getPostsByUser(profile);
 
     // Get categories available to add. 
     const categories = await db.getCategories();
@@ -100,7 +101,7 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
         return;
     }
 
-    console.log('user requested to add new category', newCategory);
+    //console.log('user requested to add new category', newCategory);
     await db.addCategory(req, newCategory);
     
     res.status(200);
@@ -108,7 +109,7 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
 });
 
 app.post("/sessionLogin", async (req, res) => {
-    console.log("Login Request received");
+    //console.log("Login Request received");
     await db.setSessionCookie(req, res);
 });
 
@@ -127,7 +128,7 @@ app.get("/createPost", db.auth, async (req, res) => {
 });
 
 app.post('/api/createCategory', db.auth, async (req, res) => {
-    console.log("Publish Post requested, body: ", req.body);
+    //console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
 
     //Check admin perms
@@ -141,7 +142,7 @@ app.post('/api/createCategory', db.auth, async (req, res) => {
 });
 
 app.post("/api/posts/publish", db.auth, async (req, res) => {
-    console.log("Publish Post requested, body: ", req.body);
+    //console.log("Publish Post requested, body: ", req.body);
     const post = req.body;
 
     let author = await db.getUser(req);
@@ -187,7 +188,7 @@ app.post("/api/posts/approve", db.auth, async (req, res) => {
     //vulernable to attacks probably. fix later. probably check origin of requests
     const user = await db.getUser(req);
 
-    console.log(user.admin)
+    //console.log(user.admin)
 
     if (!user.admin) {
         return res.redirect('/');
