@@ -48,7 +48,7 @@ app.get("/admin", db.auth, async (req, res) => {
     res.render("admin.ejs", {user: user});
 });
 
-app.get("/mod", db.auth, async (req, res) => {
+app.get("/approvePosts", db.auth, async (req, res) => {
     //Check admin perms
 	const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
