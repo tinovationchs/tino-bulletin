@@ -49,12 +49,11 @@ app.get("/admin", db.auth, async (req, res) => {
 });
 
 app.get("/mod", db.auth, async (req, res) => {
-    let posts = await db.getPosts();
     //Check admin perms
-    const user = await db.getUser(req);
+	const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
-    posts = posts.filter(function(item) {
+	let posts = await db.getPosts().filter(function(item) {
         return !item.approved;
     });
 
