@@ -102,6 +102,7 @@ async function getCategories () {
 
 function validatePost (post) {
     // Filter out bad attachment links. (Security)
+    if (post.attachments === undefined) return true;
     for (const attachment of post.attachments) 
         if (!attachment.startsWith("https://"))
             return false;
@@ -183,6 +184,27 @@ async function getUser(req) {
     } catch (error) {
         return undefined;
     }
+}
+
+// Fetches the entire database's posts, Sudo function.
+function getUnapprovedPosts() {
+    return (
+        postsRef.orderByChild('postTime')
+            .once("value")
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach( data => {
+                    const post = data.val();
+                    if (!post.approved) 
+                        posts.push(post);
+                }); 
+                return posts.reverse();
+            })
+            .catch((error) => {
+                console.log("Error on 'getAllPosts()' :", error);
+                return undefined;
+            })
+    )
 }
 
 // Fetches a list of posts.
@@ -280,6 +302,7 @@ module.exports = {
     setSessionCookie: setSessionCookie,
 
     // Queries
+    getUnapprovedPosts: getUnapprovedPosts,
     getUser: getUser,
     getUserByEmail: getUserByEmail,
     getPostsByUser: getPostsByUser,

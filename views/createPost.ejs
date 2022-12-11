@@ -29,6 +29,7 @@
                 post.title = document.getElementById("title").value;
                 post.text = document.getElementById("text").value;
                 post.category = document.getElementById("category").value;
+                post.attachments = []
 
                 await fetch('/api/posts/publish', {
                     method: 'POST',
