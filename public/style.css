@@ -26,6 +26,40 @@
   align-items: center;
   z-index: 999;
   border-radius: 6px;
-  border-thickness:thin;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#search-bar {
+  padding: 0 2%;
+
+}
+
+@media screen and (max-width:999px){
+  #search-bar{
+    width:50%;
+  }
+}
+
+@media screen and (max-width:667px){
+  #search-btn{
+    display:none;
+  }
+  #search-bar{
+    width:40%;
+  }
+  #nav-wrapper{
+    margin-left:auto !important;
+  }
+}
+
+@media screen and (max-width:525px){
+  #explore-dropdown{
+    display:none;
+  }
+}
+
+@media screen and (min-width:1000px){
+  #search-bar{
+    width:65%;
+  }
 }

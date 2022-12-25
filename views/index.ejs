@@ -5,7 +5,7 @@
         <link href="/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <%- include('./component/titlebar.ejs', {user : user}) %>
+        <%- include('./component/navbar_re.ejs', {user : user}) %>
 
         <div style="padding: 0px 15px;">
             <% if (user.admin && !admin_view) { %>
