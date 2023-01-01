@@ -20,7 +20,7 @@
 }
 
 #post-btn {
-  position: absolute;
+  position: fixed;
   bottom: 12px;
   right: 12px;
   align-items: center;
