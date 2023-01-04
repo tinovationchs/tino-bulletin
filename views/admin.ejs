@@ -2,9 +2,9 @@
 <html>
     <head>
         <link href="/style.css" rel="stylesheet" type="text/css">
+        <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
-        <%- include('./component/navbar_re.ejs', {user : user}) %>
 
         <h2>Create new category:</h2>
         <label for="category">Text:</label><br>

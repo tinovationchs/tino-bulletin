@@ -9,6 +9,7 @@
 
     <body>
         <h1 style="text-align:center;">Login to Tino Bulletin: </h1>
+        <br>
         <div id="firebaseui-auth-container"></div>
         <script> 
             fetch('/config.json').then((result) => {
@@ -20,7 +21,7 @@
                 ui.start('#firebaseui-auth-container', {
                     callbacks: {
                         signInSuccessWithAuthResult: async (authResult, redirectUrl) => {
-                            console.log("Sign-in Sucess");
+                            console.log("Sign-in Success");
                             const idtoken = await firebase.auth().currentUser.getIdToken();
                             await fetch("/sessionLogin", {
                                     method: "POST",

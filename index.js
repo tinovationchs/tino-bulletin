@@ -39,6 +39,24 @@ app.get("/", db.auth, async (req, res) => {
     });
 });
 
+app.get("/bulletins/:filterCategory", async (req, res) => {
+    const user = await db.getUser(req);
+
+    let posts = await db.getPostsForUser(user);
+
+    //include only approved posts under specified bulletin
+    posts = posts.filter(function(item) {
+        return item.approved && item.category === req.params.filterCategory;
+    });
+
+    res.render("bulletin.ejs", { 
+        user: user,
+        posts: posts,
+        admin_view: false,
+        bulletin: req.params.filterCategory
+    });
+});
+
 app.get("/admin", db.auth, async (req, res) => {
     
     //Check admin perms
@@ -117,6 +135,7 @@ app.get("/sessionLogout", (req, res) => {
     res.clearCookie('session');
     res.redirect('/login');
 });
+
 app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const categories = await db.getCategories();

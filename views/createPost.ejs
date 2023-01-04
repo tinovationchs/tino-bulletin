@@ -2,11 +2,12 @@
 <html>
     <head>
         <link href="/style.css" rel="stylesheet" type="text/css">
+        <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
-        <%- include('./component/navbar_re.ejs', {user : user}) %>
         
         <h1> Make Post: </h1>
+        <p>Posts must be approved by an administrator before they are visible. Please keep content school-appropriate!</p>
         
         <label for="title">Title:</label><br>
         <input type="text" id="title" name="text"><br>
@@ -30,14 +31,15 @@
                 const post = {}
                 post.title = document.getElementById("title").value;
                 post.text = document.getElementById("text").value;
-                if (!document.getElementById("attachments").value) {
+                if (document.getElementById("attachments").value == "") {
                     post.attachments = false;
-                }
-                post.attachments = document.getElementById("attachments").value.split(",");
-                for (let i=0; i < post.attachments.length; i++) {
-                    if (!post.attachments[i].startsWith("https://")) {
-                        alert("One of the attachments is not a valid url");
-                        return;
+                } else {
+                    post.attachments = document.getElementById("attachments").value.split(",");
+                    for (let i=0; i < post.attachments.length; i++) {
+                        if (!post.attachments[i].startsWith("https://")) {
+                            alert("At least one of the attachments is not a valid url");
+                            return;
+                        }
                     }
                 }
                 post.category = document.getElementById("category").value;

@@ -51,7 +51,7 @@ async function setSessionCookie(req, res) {
                     "email": email,
                     "name": claims.name,
                     "admin": false,
-                    "categories": {"annoucements": true},
+                    "categories": {"announcements": true},
                 };
                 usersRef.push( newUser );
             }
@@ -102,7 +102,7 @@ async function getCategories () {
 
 function validatePost (post) {
     // Filter out bad attachment links. (Security)
-    if (post.attachments === undefined) return true;
+    if (post.attachments === undefined || !post.attachments) return true;
     for (const attachment of post.attachments) 
         if (!attachment.startsWith("https://"))
             return false;
@@ -124,7 +124,7 @@ function pushPost (post) {
         authorName: post.authorName, 
         postTime: new Date().valueOf(),
         category: post.category,
-        attachment: post.attachments,
+        attachments: post.attachments,
         approved: false
     };
 
@@ -261,7 +261,7 @@ async function getPostsForUser(user) {
     
     const posts = [];
     for (const category of categories) {
-        let amount = 2;
+        let amount = 6;
         const categoryPosts = await getPosts(category, amount);
         posts.push(...categoryPosts);
     };

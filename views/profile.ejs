@@ -2,11 +2,9 @@
 <html>
     <head>
         <link href="/style.css" rel="stylesheet" type="text/css">
+        <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
-        <%- include('./component/navbar_re.ejs', {user : user}) %>
-        <a href="/createPost"> Profile </a><br>
-
         <h2><%= profile.name %></h2>
         <p><%= profile.email %></p>
         
@@ -15,16 +13,16 @@
         <% } %>
 
         <%# Profile editing for categories. %>
-        <% if (profile.email = user.email) { %>
-            <label for="category">Add Category:</label>
+        <% if (profile.email === user.email) { %>
+            <label for="category">Unsubscribed Bulletins:</label>
             <select id="category" name="category"> 
                 <% categories.forEach(category => { %>
                     <option value=<%= category %>> <%= category %> </option>
                 <% }); %>
             </select><br>
-            <button id="category-add">Add</button>
+            <button id="category-add">Subscribe</button>
 
-            <h2> Categories: </h2>
+            <h2> Subscribed Bulletins: </h2>
             <lu>
                 <% for (const category in profile.categories) { %>
                     <li><%= category %></li>
@@ -33,13 +31,21 @@
         <% } %>
 
         <h2> Posts: </h2>
-        <% posts.forEach((post) => { %>
-            <%- include('./component/postView.ejs', {post: post, admin_view: false}) %>
-        <% }); %>
+        <% if (user.admin) { %>
+            <% posts.forEach((post) => { %>
+                <%- include('./component/postView.ejs', {post: post, admin_view: true}) %>
+            <% }); %>
+        <% } else { %>
+            <% posts.forEach((post) => { %>
+                <% if (post.approved) { %>
+                <%- include('./component/postView.ejs', {post: post, admin_view: false}) %>
+                <% } %>
+            <% }); %>
+        <% } %>
 
 
         <%# Script for profile editing. %>
-        <% if (profile.email = user.email) { %>
+        <% if (profile.email === user.email) { %>
             <script>    
                 document.getElementById('category-add').onclick = async () => {
                     const body = {

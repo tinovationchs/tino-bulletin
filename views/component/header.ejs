@@ -1,2 +1,35 @@
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+<nav class="navbar sticky-top">
+    <div class = "container" id="nav-wrapper" style="max-width:95% !important; justify-content:normal !important; margin-left:9%;">
+        <a href="/" class="navbar-brand">Tino Bulletin</a>
+        <div class="nav-item dropdown" id="explore-dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Explore
+            </a>
+            <ul class="dropdown-menu">
+                <% for (const category in user.categories) { %>
+                    <li><a class="dropdown-item" href="/bulletins/<%= category %>"> <%= category %> </a></li>
+                <% } %>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Browse...</a></li>
+            </ul>
+        </div>
+        <form class="d-flex" id="search-bar" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search..." aria-label="Search" style="flex-grow:1"></input>
+            <button class="btn btn-outline-success" id="search-btn" type="submit">Search</button>
+        </form>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <%=user.name%>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/profile/<%=user.email%>">Profile</a></li>
+              <li><a class="dropdown-item" href="#">Saved</a></li>
+              <li><a class="dropdown-item" href="#">History</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
