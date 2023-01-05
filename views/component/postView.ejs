@@ -1,6 +1,6 @@
 <div class="postBox">
     <h3><%= post.title %></h3>
-    <h5><%= post.category%></h4>
+    <h5><%= post.category %></h4>
     <span>By  <a href="/profile/<%= post.author %>" style="text-decoration: none"><%= post.authorName %></a> | <%= (new Date(post.postTime)).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %></span>
     <p><%= post.text %></p>
     
