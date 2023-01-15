@@ -1,4 +1,3 @@
-const { CategoryChannel } = require("discord.js");
 const firebase = require("./firebase.js");
 
 const db = firebase.database();
@@ -265,6 +264,7 @@ async function getPostsForUser(user) {
         const categoryPosts = await getPosts(category, amount);
         posts.push(...categoryPosts);
     };
+    posts.sort((a, b) => b.postTime - a.postTime);
     return posts;
 }
 
