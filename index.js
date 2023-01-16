@@ -155,8 +155,10 @@ app.post('/api/createCategory', db.auth, async (req, res) => {
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
     //Instruct db to create new category 
-    db.createCategory(req);
-
+    let err = db.createCategory(req);
+    if (err != undefined) {
+        res.send({err: err});
+    }
     res.redirect('/');
 });
 
@@ -174,9 +176,8 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
         return;
 
     // Push post
-    db.pushPost(post);
-
-    res.redirect('/');
+    let error = await db.pushPost(post);
+    res.send({error: error});
 });
 
 app.get("/api/posts/view", db.auth, async (req, res) => {

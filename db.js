@@ -84,8 +84,20 @@ async function getSessionClaims(req) {
 
 function createCategory (req) {
     const newCat = req.body.newCategoryName;
+    const authorized = req.body.authorized.split(",").map(string => string.trim());
+    for (email in req.param.authorized) 
+        if (getUserByEmail(email) == undefined) 
+            return `None such user '${email}'`;
+    
+    console.log(authorized);
+
+    const cat_config = authorized.length > 0 ? {
+        private: true,
+        authorized: authorized,
+    } : {private: false};
+
     let pair = {};
-    pair[newCat] = true;
+    pair[newCat] = cat_config;
 
     categoriesRef.update(pair);
 }
@@ -99,21 +111,42 @@ async function getCategories () {
     return categories;
 }
 
-function validatePost (post) {
+// Sanity check of post. Current checks:
+// -> Bad attachments (injection / inapporpiate)
+// -> Unauthorized post on category.
+async function validatePost (post) {
     // Filter out bad attachment links. (Security)
-    if (post.attachments === undefined || !post.attachments) return true;
-    for (const attachment of post.attachments) 
-        if (!attachment.startsWith("https://"))
-            return false;
+    if (post.attachments !== undefined)
+        for (const attachment of post.attachments) 
+            if (!attachment.startsWith("https://"))
+                return "Invalid link";
 
-    return true;
+    // Check Category privilege
+    let auth = true;
+    await categoriesRef.once("value", snapshot => { 
+        snapshot.forEach((data) => {
+            if (data.key != post.category) return;
+
+            let cat_config = data.val();
+            // Retro-activity for old categories
+            if (cat_config.private == undefined) return;
+            auth = cat_config.private ? cat_config.authorized.includes(post.author) : true;            
+        });
+    });
+    if (!auth) 
+        return `Not authorized for category '${post.category}'`;
+
+    return undefined;
 }
 
-function pushPost (post) {
-
-    if (!validatePost(post)) {
-        console.log("Invalid post.");
-        return;
+async function pushPost (post) {
+    {
+        console.log(post);
+        let err = await validatePost(post);
+        if (err != undefined) {
+            console.log("Invalid post. Error: ", err);
+            return err;
+        }
     }
 
     let newPost = {
