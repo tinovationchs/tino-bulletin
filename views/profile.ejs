@@ -5,6 +5,7 @@
         <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
+        <div style="padding: 0px 15px;">
         <h2><%= profile.name %></h2>
         <p><%= profile.email %></p>
         
@@ -42,6 +43,7 @@
                 <% } %>
             <% }); %>
         <% } %>
+        </div>
 
 
         <%# Script for profile editing. %>

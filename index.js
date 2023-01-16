@@ -39,7 +39,7 @@ app.get("/", db.auth, async (req, res) => {
     });
 });
 
-app.get("/bulletins/:filterCategory", async (req, res) => {
+app.get("/bulletins/:filterCategory", db.auth, async (req, res) => {
     const user = await db.getUser(req);
 
     let posts = await db.getPostsForUser(user);
@@ -54,6 +54,23 @@ app.get("/bulletins/:filterCategory", async (req, res) => {
         posts: posts,
         admin_view: false,
         bulletin: req.params.filterCategory
+    });
+});
+
+app.get("/search", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+
+    let q = req.query.q;
+    let bulletin = req.query.bulletin;
+
+    let posts = await db.searchPosts(q, bulletin);
+
+    res.render("search.ejs", { 
+        user: user,
+        posts: posts,
+        admin_view: false,
+        q: q,
+        bulletin: bulletin
     });
 });
 
@@ -83,7 +100,7 @@ app.get("/approvePosts", db.auth, async (req, res) => {
     });
 });
 
-app.get("/profile/:userEmail", async (req, res) => {
+app.get("/profile/:userEmail", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     
     // Get profile being viewed

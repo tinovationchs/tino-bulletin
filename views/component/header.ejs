@@ -18,6 +18,9 @@
         </div>
         <form class="d-flex" id="search-bar" role="search" action = "/search/">
             <input id="search-query" name="q" class="form-control me-2" type="search" placeholder="Search <%= (typeof bulletin != 'undefined') ? bulletin : 'all' %>..." aria-label="Search" style="flex-grow:1"></input>
+            <% if (typeof bulletin !== 'undefined') { %>
+                <input style="display: none;" id="bulletin-hidden" name="bulletin" value="<%= bulletin %>">
+             <% } %>
             <button class="btn btn-outline-success" id="search-btn" type="submit">Search</button>
         </form>
         <div class="nav-item dropdown">

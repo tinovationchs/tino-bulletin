@@ -8,11 +8,11 @@ const categoriesRef = db.ref('categories');
 // Middleware. Checks if a session cookie corresponding to a user exists.
 // Redirects to '/login' if none is found.
 async function auth(req, res, next) {
-    const user = await getUser(req); 
+    const user = await getUser(req);
 
-    if (user === undefined) 
+    if (user === undefined)
         return res.redirect('/login');
-    
+
     console.log("Authorized.");
     next();
 }
@@ -29,7 +29,7 @@ async function setSessionCookie(req, res) {
 
         firebase.auth().verifyIdToken(idToken).then(async () => {
 
-            const sessionCookie = await firebase.auth().createSessionCookie(idToken, {expiresIn});
+            const sessionCookie = await firebase.auth().createSessionCookie(idToken, { expiresIn });
             res.cookie("session", sessionCookie);
 
             const claims = await firebase.auth().verifySessionCookie(sessionCookie, true);
@@ -50,9 +50,9 @@ async function setSessionCookie(req, res) {
                     "email": email,
                     "name": claims.name,
                     "admin": false,
-                    "categories": {"announcements": true},
+                    "categories": { "announcements": true },
                 };
-                usersRef.push( newUser );
+                usersRef.push(newUser);
             }
             res.redirect('/');
         })
@@ -65,14 +65,14 @@ async function setSessionCookie(req, res) {
 
 async function getSessionClaims(req) {
     // If no cookies exist 
-    if (!req.cookies) 
+    if (!req.cookies)
         return undefined;
-    
+
     let session_cookie = req.cookies.session;
     // If no session cookie exists
-    if (session_cookie === undefined) 
+    if (session_cookie === undefined)
         undefined;
-    
+
     // Fetch Session claims 
     try {
         return firebase.auth().verifySessionCookie(session_cookie, true);
@@ -82,19 +82,19 @@ async function getSessionClaims(req) {
     }
 }
 
-function createCategory (req) {
+function createCategory(req) {
     const newCat = req.body.newCategoryName;
     const authorized = req.body.authorized.split(",").map(string => string.trim());
-    for (email in req.param.authorized) 
-        if (getUserByEmail(email) == undefined) 
+    for (email in req.param.authorized)
+        if (getUserByEmail(email) == undefined)
             return `None such user '${email}'`;
-    
+
     console.log(authorized);
 
     const cat_config = authorized.length > 0 ? {
         private: true,
         authorized: authorized,
-    } : {private: false};
+    } : { private: false };
 
     let pair = {};
     pair[newCat] = cat_config;
@@ -102,11 +102,11 @@ function createCategory (req) {
     categoriesRef.update(pair);
 }
 
-async function getCategories () {
+async function getCategories() {
     const snapshot = await categoriesRef.once('value')
     let categories = [];
     snapshot.forEach((data) => {
-        categories.push( data.key );        
+        categories.push(data.key);
     })
     return categories;
 }
@@ -114,32 +114,32 @@ async function getCategories () {
 // Sanity check of post. Current checks:
 // -> Bad attachments (injection / inapporpiate)
 // -> Unauthorized post on category.
-async function validatePost (post) {
+async function validatePost(post) {
     // Filter out bad attachment links. (Security)
     if (post.attachments !== undefined)
-        for (const attachment of post.attachments) 
+        for (const attachment of post.attachments)
             if (!attachment.startsWith("https://"))
                 return "Invalid link";
 
     // Check Category privilege
     let auth = true;
-    await categoriesRef.once("value", snapshot => { 
+    await categoriesRef.once("value", snapshot => {
         snapshot.forEach((data) => {
             if (data.key != post.category) return;
 
             let cat_config = data.val();
             // Retro-activity for old categories
             if (cat_config.private == undefined) return;
-            auth = cat_config.private ? cat_config.authorized.includes(post.author) : true;            
+            auth = cat_config.private ? cat_config.authorized.includes(post.author) : true;
         });
     });
-    if (!auth) 
+    if (!auth)
         return `Not authorized for category '${post.category}'`;
 
     return undefined;
 }
 
-async function pushPost (post) {
+async function pushPost(post) {
     {
         console.log(post);
         let err = await validatePost(post);
@@ -150,10 +150,10 @@ async function pushPost (post) {
     }
 
     let newPost = {
-        title: post.title, 
-        text: post.text, 
-        author: post.author, 
-        authorName: post.authorName, 
+        title: post.title,
+        text: post.text,
+        author: post.author,
+        authorName: post.authorName,
         postTime: new Date().valueOf(),
         category: post.category,
         attachments: post.attachments,
@@ -197,18 +197,18 @@ async function getUserFromClaims(claims) {
 
 async function getUserByEmail(email) {
     // Query user by email
-    return ( 
+    return (
         usersRef.orderByChild('email').equalTo(email).limitToLast(1).once("value")
-        .then((snapshot) => {
-            const val = snapshot.val();
-            const userID = Object.keys(val)[0];
+            .then((snapshot) => {
+                const val = snapshot.val();
+                const userID = Object.keys(val)[0];
 
-            return val[userID];
-        }).catch((error) => {
-            return undefined;
-        })
+                return val[userID];
+            }).catch((error) => {
+                return undefined;
+            })
     );
-} 
+}
 
 async function getUser(req) {
     try {
@@ -225,11 +225,11 @@ function getUnapprovedPosts() {
             .once("value")
             .then((snapshot) => {
                 let posts = [];
-                snapshot.forEach( data => {
+                snapshot.forEach(data => {
                     const post = data.val();
-                    if (!post.approved) 
+                    if (!post.approved)
                         posts.push(post);
-                }); 
+                });
                 return posts.reverse();
             })
             .catch((error) => {
@@ -258,39 +258,40 @@ function getPosts(category, amount, offset) {
     //console.log("requested query for category: %s, request quantity: %d", category, offset+amount);
     if (category) {
         return (
-            postsRef.orderByChild('category').equalTo(category).limitToLast(offset+amount).once("value")
-            .then((snapshot) => {
-                let posts = [];
-                snapshot.forEach((data) => {
-                    posts.push( data.val());        
-                });
-                posts.sort(function(a, b) {
-                   return b.postTime - a.postTime 
-                });
-                return posts.slice(offset);
-            }).catch((error) => {
-                return undefined;
-            })
+            postsRef.orderByChild('category').equalTo(category).limitToLast(offset + amount).once("value")
+                .then((snapshot) => {
+                    let posts = [];
+                    snapshot.forEach((data) => {
+                        posts.push(data.val());
+                    });
+                    posts.sort(function(a, b) {
+                        return b.postTime - a.postTime
+                    });
+                    return posts.slice(offset);
+                }).catch((error) => {
+                    return undefined;
+                })
         );
     }
     return (
-        postsRef.orderByChild('postTime').limitToLast(offset+amount).once("value")
-        .then((snapshot) => {
-            let posts = [];
-            snapshot.forEach((data) => {
-                posts.push( data.val());        
+        postsRef.orderByChild('postTime').limitToLast(offset + amount).once("value")
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach((data) => {
+                    posts.push(data.val());
+                })
+                return posts.reverse().slice(offset);
+            }).catch((error) => {
+                return undefined;
             })
-            return posts.reverse().slice(offset);
-        }).catch((error) => {
-            return undefined;
-        })
     )
 }
+
 // Gets posts of categories configured by the user.
 // Draft function.
 async function getPostsForUser(user) {
     let categories = Object.keys(user.categories).map(category => category);
-    
+
     const posts = [];
     for (const category of categories) {
         let amount = 6;
@@ -303,21 +304,45 @@ async function getPostsForUser(user) {
 
 // Gets posts where the author is the specified user
 function getPostsByUser(user) {
-    return(
+    return (
         postsRef.orderByChild('author').equalTo(user.email).once("value")
-        .then((snapshot) => {
-            let posts = [];
-            snapshot.forEach((data) => {
-                posts.push( data.val() );        
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach((data) => {
+                    posts.push(data.val());
+                })
+                return posts.reverse();
+            }).catch((error) => {
+                return undefined;
             })
-            return posts.reverse();
-        }).catch((error) => {
-            return undefined;
-        })
     )
 }
+
+async function searchPosts(query, bulletin) {
+    query = query.toLowerCase();
+    let posts = [];
+    if (bulletin) {
+        let snapshot = await (postsRef.orderByChild('category').equalTo(bulletin)).once("value");
+        snapshot.forEach((data) => {
+            posts.push(data.val());
+        });
+        posts = posts.filter(function(post) {
+            return (post.text.toLowerCase().includes(query) || post.title.toLowerCase().includes(query)) && post.approved;
+        });
+    } else {
+        let snapshot = await postsRef.once("value");
+        snapshot.forEach((data) => {
+            posts.push(data.val());
+        });
+        posts = posts.filter(function(post) {
+            return (post.text.toLowerCase().includes(query) || post.title.toLowerCase().includes(query)) && post.approved;
+        });
+    }
+    return posts.reverse();
+}
+
 // Adds a category to the user's category list. 
-async function addCategory (req, newCategory) {
+async function addCategory(req, newCategory) {
     const user = await getUser(req);
 
     // Get snapshot referencing user, edit values, then update.
@@ -329,6 +354,7 @@ async function addCategory (req, newCategory) {
         snapshot.ref.update(val);
     });
 }
+
 module.exports = {
     // Session & Authentications
     auth: auth,
@@ -342,6 +368,8 @@ module.exports = {
     getPostsByUser: getPostsByUser,
     addCategory: addCategory,
     getPostsForUser: getPostsForUser,
+
+    searchPosts: searchPosts,
 
     // DB setting & modifying 
     pushPost: pushPost,

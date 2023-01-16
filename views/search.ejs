@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/style.css" rel="stylesheet" type="text/css">
+        <%- include('./component/header.ejs', {user : user, bulletin : bulletin}) %>
+    </head>
+    <body>
+        <div style="padding: 0px 15px;">
+            <% if (typeof bulletin !== 'undefined') { %>
+                <p>Search for "<b><%= q %></b>" in "<%= bulletin %>".</p>
+            <% } else { %>
+                <p>Search for "<b><%= q %></b>".</p>
+            <% } %>
+            <h2> Posts: </h2>
+            <% posts.forEach((post) => { %>
+                <%- include('./component/postView.ejs', {post: post, admin_view: admin_view}) %>
+            <% }); %>
+        </div>
+    </body>
+</html>
