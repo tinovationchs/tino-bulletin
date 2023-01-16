@@ -31,27 +31,28 @@
                 const post = {}
                 post.title = document.getElementById("title").value;
                 post.text = document.getElementById("text").value;
-                if (document.getElementById("attachments").value == "") {
-                    post.attachments = false;
-                } else {
-                    post.attachments = document.getElementById("attachments").value.split(",");
-                    for (let i=0; i < post.attachments.length; i++) {
-                        if (!post.attachments[i].startsWith("https://")) {
-                            alert("At least one of the attachments is not a valid url");
-                            return;
-                        }
+                post.attachments = document.getElementById("attachments").value.split(",").filter(str => !str == '');
+                for (attachment in attachments) {
+                    if (attachment.startsWith("https://")) {
+                        alert("At least one of the attachments is not a valid url");
+                        return;
                     }
-                }
+                }                
                 post.category = document.getElementById("category").value;
-                await fetch('/api/posts/publish', {
+
+                const response = await (await fetch('/api/posts/publish', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(post)
-                });
-                window.location.href = '/';
+                })).json();
+                console.log(response);
+                if (response.error !== undefined) 
+                    alert(response.error);
+                else 
+                    window.location.pathname = '/';
             }
         </script>
     </body>
