@@ -22,8 +22,6 @@ app.get("/config.json", (req, res) => {
 
 app.get("/", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    //console.log("from .get('/'), user: ", user);
-
     let posts = await db.getPostsForUser(user);
 
     //exclude unapproved posts
@@ -39,21 +37,38 @@ app.get("/", db.auth, async (req, res) => {
     });
 });
 
-app.get("/bulletins/:filterCategory", db.auth, async (req, res) => {
+app.get("/bulletins/:category", db.auth, async (req, res) => {
     const user = await db.getUser(req);
+    const category_conf = await db.getCategory(req.params.category);
+    const perms = user.admin || category_conf.moderators.includes(user.email);
 
-    let posts = await db.getPostsForUser(user);
-
-    //include only approved posts under specified bulletin
-    posts = posts.filter(function(item) {
-        return item.approved && item.category === req.params.filterCategory;
-    });
+    let posts = await db.getPostsByCategory(req.params.category);
+    posts = posts.filter( item => item.approved );
 
     res.render("bulletin.ejs", { 
         user: user,
         posts: posts,
-        admin_view: false,
-        bulletin: req.params.filterCategory
+        moderator: perms,
+        mod_view: false,
+        bulletin: req.params.category
+    });
+});
+app.get("/bulletins/mod/:category", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+    const category_conf = await db.getCategory(req.params.category);
+    const perms = user.admin || category_conf.moderators.includes(user.email);
+    if (!perms) 
+        res.status(403).send(`unauthorized for category '${req.params.category}'`);
+
+    let posts = await db.getPostsByCategory(req.params.category);
+    posts = posts.filter( item => !item.approved );
+
+    res.render("bulletin.ejs", { 
+        user: user,
+        posts: posts,
+        moderator: true,
+        mod_view: true,
+        bulletin: req.params.category
     });
 });
 
@@ -224,18 +239,15 @@ app.get("/admin", db.auth, async (req, res) => {
 app.post("/api/posts/approve", db.auth, async (req, res) => {
     //vulernable to attacks probably. fix later. probably check origin of requests
     const user = await db.getUser(req);
+    const post = req.body;
+    const category_conf = await db.getCategory(post.category);
+    const perms = user.admin || category_conf.moderators.includes(user.email);
 
-    //console.log(user.admin)
-
-    if (!user.admin) {
-        return res.redirect('/');
-    }
-
-    let post_content = req.body;
-
-    await db.approvePost(post_content);
-
-    return res.send("SUCCESS");
+    if (!perms) 
+        return res.status(403).send("unauthorized");
+    
+    await db.approvePost(post);
+    return res.status(200).send("ack");
 });
 
 app.listen(port, () => {
