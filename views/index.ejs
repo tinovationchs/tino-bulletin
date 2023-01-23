@@ -6,12 +6,11 @@
     </head>
     <body>
 
-        <div style="padding: 0px 15px;">
+        <div id="main">
             <% if (user.admin && !admin_view) { %>
                 <a href="/admin"> Admin </a><br>
                 <a href="/approvePosts"> Approve Posts </a>
             <% } %>
-            <h2> Posts: </h2>
             <p>Only posts from subscribed bulletins are shown</p>
             <% posts.forEach((post) => { %>
                 <%- include('./component/postView.ejs', {post: post, admin_view: admin_view}) %>
