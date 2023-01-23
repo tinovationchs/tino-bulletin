@@ -29,38 +29,34 @@ node index.js
 ## DB Schema
 
 ```
-categories
-
-child category
-string (category): {
-  authorized: array[string] (array of emails)
-  moderator: array[string] (array of emails)
-  private: bool
+__categories__ : {
+    category_name : {
+        members: [string (email)] 
+        moderators: [string (email)]
+        private: bool
+    }
 }
 
-posts
-
-child post obj
-{
-  approved: bool
-  author: string (email)
-  authorName: string
-  attachments: array[string] | undefined
-  category: string
-  postTime: int (timestamp, unix milliseconds)
-  text: string
-  title: string
+__posts__ : {
+    id : {
+        approved: bool
+        author: string (email)
+        authorName: string (username) 
+        attachments: [string (url)] | undefined
+        category: string 
+        postTime: int (unix milliseconds timestamp)
+        text: string
+        title: string
+    }
 }
 
-users
-
-child user obj
-{
-  admin: bool
-  categories: {
-    string (category name): bool
-  }
-  email: string
-  name: string
+__users__ : {
+    id : {
+        admin: bool
+        categories: {
+            string (category): true 
+        }
+        email: string
+        name: string
 }
 ```
