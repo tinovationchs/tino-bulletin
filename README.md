@@ -29,15 +29,16 @@ node index.js
 ## DB Schema
 
 ```
-__categories__ : {
+categories : {
     category_name : {
         members: [string (email)] 
         moderators: [string (email)]
         private: bool
     }
+    ...
 }
 
-__posts__ : {
+posts : {
     id : {
         approved: bool
         author: string (email)
@@ -48,9 +49,10 @@ __posts__ : {
         text: string
         title: string
     }
+    ...
 }
 
-__users__ : {
+users : {
     id : {
         admin: bool
         categories: {
@@ -58,5 +60,7 @@ __users__ : {
         }
         email: string
         name: string
+    }
+    ...
 }
 ```
