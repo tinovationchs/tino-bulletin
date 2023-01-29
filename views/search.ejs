@@ -5,7 +5,7 @@
         <%- include('./component/header.ejs', {user : user, bulletin : bulletin}) %>
     </head>
     <body>
-        <div style="padding: 0px 15px;">
+        <div id="main">
             <% if (typeof bulletin !== 'undefined') { %>
                 <p>Search for "<b><%= q %></b>" in "<%= bulletin %>".</p>
             <% } else { %>

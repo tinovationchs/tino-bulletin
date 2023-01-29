@@ -12,8 +12,8 @@
                 <% for (const category in user.categories) { %>
                     <li><a class="dropdown-item" href="/bulletins/<%= category %>"> <%= category %> </a></li>
                 <% } %>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Browse...</a></li>
+                <!--<li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Browse...</a></li>-->
             </ul>
         </div>
         <form class="d-flex" id="search-bar" role="search" action = "/search/">
@@ -29,8 +29,8 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="/profile/<%=user.email%>">Profile</a></li>
-              <li><a class="dropdown-item" href="#">Saved</a></li>
-              <li><a class="dropdown-item" href="#">History</a></li>
+              <!--<li><a class="dropdown-item" href="#">Saved</a></li>
+              <li><a class="dropdown-item" href="#">History</a></li>-->
               <li><a class="dropdown-item" href="/sessionLogout">Log Out</a></li>
             </ul>
         </div>

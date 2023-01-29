@@ -2,28 +2,36 @@
 <html>
     <head>
         <link href="/style.css" rel="stylesheet" type="text/css">
+        <link href="/createPost.css" rel="stylesheet" type="text/css">
         <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
-        <div>
-            <h1> Make Post: </h1>
+        <div id="create-post-body">
+            <h1> Create a post </h1>
             <p>Posts must be approved by an administrator before they are visible. Please keep content school-appropriate!</p>
-        
-            <label for="title">Title:</label><br>
-            <input type="text" id="title" name="text"><br>
-            <label for="text">Text:</label><br>
-            <input type="text" id="text" name="text"><br><br>
-            <label for="attachment">Attachment URL (CSV):</label><br>
-            <input type="text" id="attachments" name="attachments" placeholder="https://imgur.com/..."><br><br>
 
-            <label for="category">Category:</label>
+            <hr>
+
+            <label for="category">Bulletin:</label>
             <select id="category" name="category"> 
+                <!-- SHINE HELP -->
                 <% categories.forEach(category => { %>
-                    <option value=<%= category %>> <%= category %> </option>
+                    <% if (!category.private || (category.private && category.authorized.includes(user))) { %>
+                        <option value=<%= category %>> <%= category %> </option>
+                    <% } %>
                 <% }); %>
             </select><br>
+        
+            <div id="create-post-form">
+                <label for="title">Title:</label><br>
+                <input type="text" id="title" name="text"><br>
+                <label for="text">Text:</label><br>
+                <input type="text" id="text" name="text"><br><br>
+                <label for="attachment">Attachment URL (CSV):</label><br>
+                <input type="text" id="attachments" name="attachments" placeholder="https://imgur.com/..."><br><br>
 
-            <button id="publishPost" onclick="publishPost()"> Post </button>
+                <button id="publishPost" onclick="publishPost()"> Post </button>
+            </div>
         </div>
             
         <script>
