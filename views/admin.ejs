@@ -9,15 +9,18 @@
         <h2>Create new category:</h2>
         <label for="category">Text:</label><br>
         <input type="text" id="category" name="category"><br>
-        <textarea id="authorized" name="authorized" rows="4" cols="50"
-            placeholder="comma-separated list of emails addresses. (to make private, leave blank)"></textarea><br>
+        <textarea id="members" name="members" rows="4" cols="50"
+            placeholder="comma-separated list of member addresses. (to make public, leave blank)"></textarea><br>
+        <textarea id="moderators" name="moderators" rows="4" cols="50"
+            placeholder="comma-separated list of moderator addresses."></textarea><br>
         <button onclick="createCategory()">Create Category</button>
 
         <script>
             async function createCategory () {
                 const body = {
                     newCategoryName: document.getElementById("category").value,
-                    authorized: document.getElementById("authorized").value,
+                    members: document.getElementById("members").value,
+                    moderators: document.getElementById("moderators").value,
                 };
                 console.log(document.getElementById("authorized"));
 

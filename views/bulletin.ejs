@@ -6,14 +6,16 @@
     </head>
     <body>
 
-        <div id="main">
-            <% if (user.admin && !admin_view) { %>
-                <a href="/admin"> Admin </a><br>
-                <a href="/approvePosts"> Approve Posts </a>
+        <div id="main" style="padding: 0px 15px;">
+            <% if (moderator && !mod_view) { %>
+                <a href="/bulletins/mod/<%= bulletin %>"> Moderator View </a>
             <% } %>
+            <% if (moderator && mod_view) { %>
+                <a href="/bulletins/<%= bulletin %>"> Member View </a>
+            <% } %> 
             <p>You are currently viewing <b><%= bulletin %></b>.</p>
             <% posts.forEach((post) => { %>
-                <%- include('./component/postView.ejs', {post: post, admin_view: admin_view}) %>
+                <%- include('./component/postView.ejs', {post: post, admin_view: mod_view}) %>
             <% }); %>
         
             <a href="/createPost" class="btn btn-light" id="post-btn">
@@ -24,7 +26,7 @@
         </div>
         <script>
             async function approvePost(post) {
-                await fetch('/api/posts/approve', {
+                const res = await fetch('/api/posts/approve', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -32,6 +34,7 @@
                     },
                     body: JSON.stringify(post)
                 });
+                console.log(res);
             }
         </script>
     </body>

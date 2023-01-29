@@ -25,3 +25,42 @@ Then run backend
 ```
 node index.js
 ```
+
+## DB Schema
+
+```
+categories : {
+    category_name : {
+        members: [string (email)] 
+        moderators: [string (email)]
+        private: bool
+    }
+    ...
+}
+
+posts : {
+    id : {
+        approved: bool
+        author: string (email)
+        authorName: string (username) 
+        attachments: [string (url)] | undefined
+        category: string 
+        postTime: int (unix milliseconds timestamp)
+        text: string
+        title: string
+    }
+    ...
+}
+
+users : {
+    id : {
+        admin: bool
+        categories: {
+            string (category): true 
+        }
+        email: string
+        name: string
+    }
+    ...
+}
+```
