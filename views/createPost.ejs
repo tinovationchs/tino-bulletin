@@ -14,7 +14,6 @@
 
             <label for="category">Bulletin:</label>
             <select id="category" name="category"> 
-                <!-- SHINE HELP -->
                 <% categories.forEach(category => { %>
                     <% if (!category.private || (category.private && category.authorized.includes(user))) { %>
                         <option value=<%= category %>> <%= category %> </option>

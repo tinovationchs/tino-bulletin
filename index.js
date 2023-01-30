@@ -127,7 +127,7 @@ app.get("/profile/:userEmail", db.auth, async (req, res) => {
     const posts = await db.getPostsByUser(profile);
 
     // Get categories available to add. 
-    const categories = await db.getCategories();
+    const categories = Object.keys(await db.getCategories());
     const newCategories = 
         profile.categories != undefined ? categories.filter( category => !(category in profile.categories) ) : categories; 
     
@@ -145,17 +145,13 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
     if (newCategory === undefined) return;
 
     // Check if category exists
-    if ((await db.getCategories()).indexOf(newCategory) == -1) {
+    if (await db.getCategory(newCategory) != undefined) {
         // Alert user
-        res.send({error: 'none such category'});
+        res.send({error: `Category '${newCategory}' already exists`});
         return;
     }
-
-    //console.log('user requested to add new category', newCategory);
     await db.addCategory(req, newCategory);
-    
-    res.status(200);
-    res.json({});
+    res.status(200).json({});
 });
 
 app.post("/sessionLogin", async (req, res) => {
@@ -170,7 +166,10 @@ app.get("/sessionLogout", (req, res) => {
 
 app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    const categories = await db.getCategories();
+    const categories = 
+        Object.entries(await db.getCategories())
+            .filter(i => !i[1].private || (i[1].members == undefined ? false : i[1].members.includes(user.email)))
+            .map(i => i[0]);
 
     res.render("createPost.ejs", { 
         user: user,

@@ -84,8 +84,8 @@ async function getSessionClaims(req) {
 
 function createCategory(req) {
     const newCategoryName = req.body.newCategoryName;
-    const members = req.body.members.split(",").map(string => string.trim());
-    const moderators = req.body.moderators.split(",").map(string => string.trim());
+    const members = req.body.members.split(",").map(str => str.trim()).filter(str => str != "");
+    const moderators = req.body.moderators.split(",").map(str => str.trim()).filter(str => str != "");
 
     for (email in members)
         if (getUserByEmail(email) == undefined)
@@ -114,7 +114,7 @@ async function getCategories() {
     const snapshot = await categoriesRef.once('value')
     let categories = [];
     snapshot.forEach((data) => {
-        categories.push(data.key);
+        categories[data.key] = data.val();
     })
     return categories;
 }
