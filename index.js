@@ -22,17 +22,9 @@ app.get("/config.json", (req, res) => {
 
 app.get("/", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    let posts = await db.getPostsForUser(user);
-
-    //exclude unapproved posts
-    posts = posts.filter(function(item) {
-        return item.approved;
-    });
-    //console.log("from .get('/'), posts: ", posts);
 
     res.render("index.ejs", { 
         user: user,
-        posts: posts,
         admin_view: false
     });
 });
@@ -211,11 +203,14 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
     res.send({error: error});
 });
 
-app.get("/api/posts/view", db.auth, async (req, res) => {
-    let category = req.query.category
-    let amount = Number(req.query.amount);
-    let offset = Number(req.query.offset);
-    const posts = await db.getPosts(category, amount, offset);
+app.get("/api/posts/get", db.auth, async (req, res) => {
+    console.log(req.query);
+     
+    const offset = Number(req.query.offset);
+    const amount = Number(req.query.amount);
+    const user = await db.getUser(req);
+    const posts = await db.getPostsForUser(user, offset, amount);
+
     return res.json(posts);
 });
 

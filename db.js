@@ -299,19 +299,19 @@ async function getPostsByCategory (category) {
     return getPosts(category, 20, 0);
 }
 
-// Gets posts of categories configured by the user.
-// Draft function.
-async function getPostsForUser(user) {
+// Gets posts of categories configured by the user. Given an offset
+async function getPostsForUser(user, offset = 0, amount = 5) {
     let categories = Object.keys(user.categories).map(category => category);
 
     const posts = [];
     for (const category of categories) {
-        let amount = 6;
+        let amount = 20;
         const categoryPosts = await getPosts(category, amount);
         posts.push(...categoryPosts);
     };
     posts.sort((a, b) => b.postTime - a.postTime);
-    return posts;
+    console.log(posts.length);
+    return posts.slice(offset, offset+amount);
 }
 // Gets posts where the author is the specified user
 function getPostsByUser(user) {
@@ -392,6 +392,7 @@ module.exports = {
     getUser: getUser,
     getUserByEmail: getUserByEmail,
 
+    getPosts: getPosts,
     getPostsByUser: getPostsByUser,
     getPostsByCategory: getPostsByCategory,
     getCategory: getCategory,
