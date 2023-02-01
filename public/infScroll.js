@@ -1,33 +1,12 @@
-const post_template = `
-<div class="postBox">
-    <h2 id="post-title"><%= post.title %></h2>
-    <h5><a href = "bulletins/<%= post.category %>/" style="text-decoration:none"><%= post.category %></a> </h4>
-    <span>By  <a href="/profile/<%= post.author %>" style="text-decoration: none"><%= post.authorName %></a> | <%= (new Date(post.postTime)).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %></span>
-    <p id="post-text"><%= post.text %></p>
-    
-    <% if (admin_view && !post.approved) { %>
-        <% if (post.attachments != false && post.attachments != undefined) { %>
-            <% post.attachments.forEach(function(attachment) { %>
-                <p><%= attachment %></p>
-            <% }); %>
-        <% } %>
-        
-        <button onclick="approvePost(<%= JSON.stringify(post) %>)">Approve Post</button>
-    <% } if (post.approved && post.attachments != false && post.attachments != undefined) { %>
-        <% post.attachments.forEach(function(attachment) { %>
-            <% if (attachment.endsWith('.png') || attachment.endsWith('.jpg')) { %>
-                <img src="<%= attachment %>"/>
-            <% } else { %>
-                <p><%= attachment %></p>
-            <% } %>
-        <% }); %>
-    <% } %>
-</div>
-`;
 const loading_elem = document.getElementById("loading_post");
 const feed = document.getElementById("feed");
 let loading = false;
 let offset = 0;
+
+function reachedBottom () {
+    document.removeEventListener("scroll", onscroll);
+    document.getElementById("loadingPost").style.display = 'none';
+}
 
 const onscroll = e => {
     if (!shouldLoad()) return;
@@ -38,22 +17,20 @@ const onscroll = e => {
     // Start Load
     const amount = 5;
     let params = {
-        category: "Officer's-Exclusives",
         amount: amount,
         offset: offset,
     };
 
-    fetch("/api/posts/get?" + new URLSearchParams(params), {
-        method: "GET",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        query: JSON.stringify(params),
-    })
+    fetchPosts(params)
     .then(res => res.json())
     .then(res => {
         console.log(res);
+        // If reached bottom 
+        if (res.reachedBottom) {
+            reachedBottom();
+            return;
+        }
+
         for (const post of res) {
             console.log(post);
             const elem = document.createElement("div");
@@ -68,7 +45,7 @@ const onscroll = e => {
             loading = false;
             console.log("throttle done");
             onscroll();
-        }, 3000);
+        }, 1500);
     })
     .catch(err => {
         console.log("error: ", err);
@@ -76,11 +53,8 @@ const onscroll = e => {
             loading = false;
             console.log("throttle done");
             onscroll();
-        }, 3000);
+        }, 1500);
     });
-
-
-    // Spawn Loading animation
 };
 
 function shouldLoad () {

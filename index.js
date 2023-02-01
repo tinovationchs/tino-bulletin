@@ -34,13 +34,10 @@ app.get("/bulletins/:category", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const category_conf = await db.getCategory(req.params.category);
     const perms = user.admin || ((typeof category_conf.moderators === 'undefined') ? false : category_conf.moderators.includes(user.email));
-
-    let posts = await db.getPostsByCategory(req.params.category);
-    posts = posts.filter( item => item.approved );
+    console.log(req.params.category);
 
     res.render("bulletin.ejs", { 
         user: user,
-        posts: posts,
         moderator: perms,
         mod_view: false,
         bulletin: req.params.category
@@ -52,13 +49,9 @@ app.get("/bulletins/mod/:category", db.auth, async (req, res) => {
     const perms = user.admin || category_conf.moderators.includes(user.email);
     if (!perms) 
         res.status(403).send(`unauthorized for category '${req.params.category}'`);
-
-    let posts = await db.getPostsByCategory(req.params.category);
-    posts = posts.filter( item => !item.approved );
-
+    console.log(req.params.category);
     res.render("bulletin.ejs", { 
         user: user,
-        posts: posts,
         moderator: true,
         mod_view: true,
         bulletin: req.params.category
@@ -88,25 +81,14 @@ app.get("/admin", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
-    res.render("admin.ejs", {user: user});
-});
+    const posts = await db.getPosts(undefined, 20, 0, false, true);
 
-app.get("/approvePosts", db.auth, async (req, res) => {
-    //Check admin perms
-	const user = await db.getUser(req);
-    if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
-
-    let posts = await db.getUnapprovedPosts()
-    
-    console.log("posts: ", posts);
-
-    res.render("index.ejs", { 
+    res.render("admin.ejs", {
         user: user,
         posts: posts,
-        admin_view: true,
-        inf_scroll: false
     });
 });
+
 
 app.get("/profile/:userEmail", db.auth, async (req, res) => {
     const user = await db.getUser(req);
@@ -206,31 +188,28 @@ app.post("/api/posts/publish", db.auth, async (req, res) => {
 
 app.get("/api/posts/get", db.auth, async (req, res) => {
     console.log(req.query);
-     
     const offset = Number(req.query.offset);
     const amount = Number(req.query.amount);
-    const user = await db.getUser(req);
-    const posts = await db.getPostsForUser(user, offset, amount);
+    let posts;
 
-    return res.json(posts);
+    // If category is not specified, get from all cats of user
+    if (req.query.category === undefined) {
+        const user = await db.getUser(req);
+        posts = await db.getPostsForUser(user, offset, amount);
+    } else {
+        posts = await db.getPostsByCategory(req.query.category, offset, amount);
+    } 
+    return posts.length == 0 ? res.json({reachedBottom: true}) : res.json(posts);
 });
 
-app.get("/admin", db.auth, async (req, res) => {
-    const user = await db.getUser(req);
-
-    if (!user.admin) {
-        return res.redirect('/');
-    }
+app.get("/api/posts/get-unapproved", db.auth, async (req, res) => {
+    console.log(req.query);
+    const offset = Number(req.query.offset);
+    const amount = Number(req.query.amount);
+    const posts = await db.getPosts(req.query.category, amount, offset, false, true);
     
-    const posts = await db.getPosts();
-
-    res.render("index.ejs", {
-        user: user,
-        posts: posts,
-        admin_view: true
-    });
+    return posts.length == 0 ? res.json({reachedBottom: true}) : res.json(posts);
 });
-
 app.post("/api/posts/approve", db.auth, async (req, res) => {
     //vulernable to attacks probably. fix later. probably check origin of requests
     const user = await db.getUser(req);

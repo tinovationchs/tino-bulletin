@@ -14,9 +14,9 @@
                 <a href="/bulletins/<%= bulletin %>"> Member View </a>
             <% } %> 
             <p>You are currently viewing <b><%= bulletin %></b>.</p>
-            <% posts.forEach((post) => { %>
-                <%- include('./component/postView.ejs', {post: post, admin_view: mod_view}) %>
-            <% }); %>
+            
+            <div id="feed"></div>
+            <div id="loadingPost" class="postBox" ></div>
         
             <a href="/createPost" class="btn btn-light" id="post-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -24,18 +24,31 @@
                 <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
             </svg> Create Post</a>
         </div>
+        <script src="https://unpkg.com/ejs@3.1.6/ejs.min.js"></script>
+        <script src="/postViewTemplate.js"></script>
+        
+         
         <script>
-            async function approvePost(post) {
-                const res = await fetch('/api/posts/approve', {
-                    method: 'POST',
+            const fetchPosts = (params) => {
+                params.category = "<%- bulletin %>";
+                
+                <% if (!mod_view) { %>
+                const url = "/api/posts/get?";
+                <% } else { %> 
+                const url = "/api/posts/get-unapproved?";
+                <% } %>
+
+
+                return fetch(url + new URLSearchParams(params), {
+                    method: "GET",
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(post)
+                    query: JSON.stringify(params),
                 });
-                console.log(res);
             }
         </script>
+        <script src="/infScroll.js"></script> 
     </body>
 </html>

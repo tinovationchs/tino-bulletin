@@ -9,14 +9,11 @@
         <div id="main">
             <% if (user.admin && !admin_view) { %>
                 <a href="/admin"> Admin </a><br>
-                <a href="/approvePosts"> Approve Posts </a>
             <% } %>
             <p>Only posts from subscribed bulletins are shown</p>
-            
-            <% if (inf_scroll) { %>
-                <div id="feed"></div>
-                <div id="loadingPost" class="postBox" ></div>
-            <% } %>
+        
+            <div id="feed"></div>
+            <div id="loadingPost" class="postBox" ></div>
 
             <a href="/createPost" class="btn btn-light" id="post-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -25,6 +22,17 @@
             </svg> Create Post</a>
         </div>
         <script src="https://unpkg.com/ejs@3.1.6/ejs.min.js"></script>
-        <script src="infinite_scroll.js"></script>
+        <script src="postViewTemplate.js"></script>
+        <script>
+            const fetchPosts = (params) => fetch("/api/posts/get?" + new URLSearchParams(params), {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                query: JSON.stringify(params),
+            });
+        </script>
+        <script src="infScroll.js"></script> 
     </body>
 </html>

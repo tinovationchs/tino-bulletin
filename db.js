@@ -230,77 +230,56 @@ async function getUser(req) {
     }
 }
 
-// Fetches the entire database's posts, Sudo function.
-function getUnapprovedPosts() {
-    return (
-        postsRef.orderByChild('postTime')
-            .once("value")
-            .then((snapshot) => {
-                let posts = [];
-                snapshot.forEach(data => {
-                    const post = data.val();
-                    if (!post.approved)
-                        posts.push(post);
-                });
-                return posts.reverse();
-            })
-            .catch((error) => {
-                console.log("Error on 'getAllPosts()' :", error);
-                return undefined;
-            })
-    )
-}
-
 // Fetches a list of posts.
 // NOTE: Draft function, later revisions may use an actual algorithm to tailor the posts
 //  to the user.
-function getPosts(category, amount, offset) {
-    if (!amount) {
-        amount = 2;
-    }
-
-    if (amount > 25) {
-        amount = 25;
-    }
-
-    if (!offset) {
-        offset = 0;
-    }
-
-    //console.log("requested query for category: %s, request quantity: %d", category, offset+amount);
-    if (category) {
-        return (
-            postsRef.orderByChild('category').equalTo(category).limitToLast(offset + amount).once("value")
-                .then((snapshot) => {
-                    let posts = [];
-                    snapshot.forEach((data) => {
-                        posts.push(data.val());
-                    });
-                    posts.sort(function(a, b) {
-                        return b.postTime - a.postTime
-                    });
-                    return posts.slice(offset);
-                }).catch((error) => {
-                    return undefined;
-                })
-        );
-    }
-    return (
+function getPosts(category, amount, offset, only_approved, only_unapproved) {
+    if (!(only_approved ^ only_unapproved)) 
+        console.error("'getPosts' error, can't have both only-unapproved and only-approved")
+    if (!amount) amount = 2;
+    if (amount > 25) amount = 25;
+    if (!offset) offset = 0;
+    
+    return category ? 
+        postsRef.orderByChild('category').equalTo(category).limitToLast(offset + amount).once("value")
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach((data) => {
+                    const post = data.val();
+                    if (only_approved) {
+                        if ( post.approved) posts.push(data.val());
+                    } else if (only_unapproved) {
+                        if (!post.approved) posts.push(data.val()); 
+                    }
+                });
+                posts.sort((a, b) => b.postTime - a.postTime);
+                console.log(offset);
+                return posts.slice(offset);
+            }).catch(e => undefined) :
         postsRef.orderByChild('postTime').limitToLast(offset + amount).once("value")
             .then((snapshot) => {
                 let posts = [];
                 snapshot.forEach((data) => {
-                    posts.push(data.val());
-                })
-                return posts.reverse().slice(offset);
+                    const post = data.val();
+                    if (only_approved) {
+                        if (post.approved) posts.push(data.val());
+                    } else if (only_unapproved) {
+                        if (!post.approved) posts.push(data.val()); 
+                    }
+                });
+                posts.sort(function(a, b) {
+                    return b.postTime - a.postTime
+                });
+                return posts.slice(offset);
             }).catch((error) => {
                 return undefined;
             })
-    )
 }
 
-async function getPostsByCategory (category) {
-    return getPosts(category, 20, 0);
+async function getPostsByCategory (category, offset=0, amount=5) {
+    console.log(category);
+    const posts = getPosts(category, amount, offset, true);
+    return posts;
 }
 
 // Gets posts of categories configured by the user. Given an offset
@@ -310,7 +289,7 @@ async function getPostsForUser(user, offset = 0, amount = 5) {
     const posts = [];
     for (const category of categories) {
         let amount = 20;
-        const categoryPosts = await getPosts(category, amount);
+        const categoryPosts = await getPosts(category, amount, 0, true);
         posts.push(...categoryPosts);
     };
     posts.sort((a, b) => b.postTime - a.postTime);
@@ -392,7 +371,6 @@ module.exports = {
     setSessionCookie: setSessionCookie,
 
     // Queries
-    getUnapprovedPosts: getUnapprovedPosts,
     getUser: getUser,
     getUserByEmail: getUserByEmail,
 
