@@ -25,7 +25,8 @@ app.get("/", db.auth, async (req, res) => {
 
     res.render("index.ejs", { 
         user: user,
-        admin_view: false
+        admin_view: false,
+        inf_scroll: true
     });
 });
 
@@ -95,7 +96,6 @@ app.get("/approvePosts", db.auth, async (req, res) => {
 	const user = await db.getUser(req);
     if (!user.admin) return res.status(403).send('UNAUTHORIZED REQUEST!');
 
-    console.log("Mod authorized. on '/mod' GET.");
     let posts = await db.getUnapprovedPosts()
     
     console.log("posts: ", posts);
@@ -103,7 +103,8 @@ app.get("/approvePosts", db.auth, async (req, res) => {
     res.render("index.ejs", { 
         user: user,
         posts: posts,
-        admin_view: true
+        admin_view: true,
+        inf_scroll: false
     });
 });
 

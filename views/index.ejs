@@ -12,8 +12,11 @@
                 <a href="/approvePosts"> Approve Posts </a>
             <% } %>
             <p>Only posts from subscribed bulletins are shown</p>
-            <div id="feed"></div>
-            <div id="loadingPost" class="postBox" ></div>
+            
+            <% if (inf_scroll) { %>
+                <div id="feed"></div>
+                <div id="loadingPost" class="postBox" ></div>
+            <% } %>
 
             <a href="/createPost" class="btn btn-light" id="post-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -22,6 +25,6 @@
             </svg> Create Post</a>
         </div>
         <script src="https://unpkg.com/ejs@3.1.6/ejs.min.js"></script>
-        <script src="script.js"></script>
+        <script src="infinite_scroll.js"></script>
     </body>
 </html>
