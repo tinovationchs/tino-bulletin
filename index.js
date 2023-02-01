@@ -32,7 +32,7 @@ app.get("/", db.auth, async (req, res) => {
 app.get("/bulletins/:category", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const category_conf = await db.getCategory(req.params.category);
-    const perms = user.admin || category_conf.moderators.includes(user.email);
+    const perms = user.admin || ((typeof category_conf.moderators === 'undefined') ? false : category_conf.moderators.includes(user.email));
 
     let posts = await db.getPostsByCategory(req.params.category);
     posts = posts.filter( item => item.approved );
