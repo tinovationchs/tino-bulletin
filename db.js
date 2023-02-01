@@ -130,6 +130,8 @@ async function validatePost(post) {
                 return "Invalid link";
 
     // Check Category privilege
+    // unnecessary with new bulletin filter in create post form
+    /*
     let auth = true;
     await categoriesRef.once("value", snapshot => {
         snapshot.forEach((data) => {
@@ -137,13 +139,15 @@ async function validatePost(post) {
 
             let category = data.val();
             // Retro-activity for old categories
+            // with new db likely won't be needed in the future ...
             if (category.private == undefined) return;
             auth = category.private ? category.members.includes(post.author) : true;
         });
     });
     if (!auth)
         return `Not a member of category '${post.category}'`;
-
+    */
+   
     return undefined;
 }
 
