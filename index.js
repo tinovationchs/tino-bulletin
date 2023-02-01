@@ -161,7 +161,7 @@ app.get("/createPost", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const categories = 
         Object.entries(await db.getCategories())
-            .filter(i => !i[1].private || (i[1].members == undefined ? false : i[1].members.includes(user.email)))
+            .filter(i => !i[1].private|| user.admin || (i[1].members == undefined ? false : i[1].members.includes(user.email)))
             .map(i => i[0]);
 
     res.render("createPost.ejs", { 
