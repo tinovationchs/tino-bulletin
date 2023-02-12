@@ -48,6 +48,11 @@ body {
     width: 100%;
 }
 
+.attachment {
+  max-width: 95%;
+  object-fit: contain;
+}
+
 #post-title {
   font-family: Lato, sans-serif;
 }

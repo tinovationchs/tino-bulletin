@@ -15,7 +15,7 @@
     <% } if (post.approved && post.attachments != false && post.attachments != undefined) { %>
         <% post.attachments.forEach(function(attachment) { %>
             <% if (attachment.endsWith('.png') || attachment.endsWith('.jpg')) { %>
-                <img src="<%= attachment %>"/>
+                <img class="attachment" src="<%= attachment %>"/>
             <% } else { %>
                 <p><%= attachment %></p>
             <% } %>
