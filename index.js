@@ -119,13 +119,15 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
     const newCategory = req.body.newCategory;
     if (newCategory === undefined) return;
 
-    // Check if category exists
-    if (await db.getCategory(newCategory) != undefined) {
-        // Alert user
-        res.send({error: `Category '${newCategory}' already exists`});
-        return;
-    }
     await db.addCategory(req, newCategory);
+    res.status(200).json({});
+});
+
+app.post("/api/profile/removeCategory", db.auth, async (req, res) => {
+    const category = req.body.category;
+    if (newCategory === undefined) return;
+
+    await db.removeCategory(req, category);
     res.status(200).json({});
 });
 

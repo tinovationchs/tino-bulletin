@@ -365,6 +365,19 @@ async function addCategory(req, newCategory) {
     });
 }
 
+async function removeCategory(req, category) {
+    const user = await getUser(req);
+
+    // Get snapshot referencing user, edit values, then update.
+    await usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", function(snapshot) {
+        const val = snapshot.val();
+        const userID = Object.keys(val)[0];
+        if (val[userID].categories == undefined) val[userID].categories = {};
+        delete val[userID].categories[category];
+        snapshot.ref.update(val);
+    });
+}
+
 module.exports = {
     // Session & Authentications
     auth: auth,
@@ -379,6 +392,7 @@ module.exports = {
     getPostsByCategory: getPostsByCategory,
     getCategory: getCategory,
     addCategory: addCategory,
+    removeCategory: removeCategory,
     getPostsForUser: getPostsForUser,
 
     searchPosts: searchPosts,
