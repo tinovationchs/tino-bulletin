@@ -36,7 +36,7 @@ const onscroll = e => {
             const elem = document.createElement("div");
             elem.innerHTML = ejs.render(post_template, {
                 post: post,
-                admin_view: false
+                admin_view: ADMIN_VIEW,
             });
             feed.appendChild(elem);
         };

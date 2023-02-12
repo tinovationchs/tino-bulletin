@@ -9,7 +9,6 @@ const categoriesRef = db.ref('categories');
 // Redirects to '/login' if none is found.
 async function auth(req, res, next) {
     const user = await getUser(req);
-
     if (user === undefined)
         return res.redirect('/login');
 
@@ -246,6 +245,7 @@ function getPosts(category, amount, offset, only_approved, only_unapproved) {
                 let posts = [];
                 snapshot.forEach((data) => {
                     const post = data.val();
+                    post.id = data.key;
                     if (only_approved) {
                         if ( post.approved) posts.push(data.val());
                     } else if (only_unapproved) {
@@ -261,6 +261,7 @@ function getPosts(category, amount, offset, only_approved, only_unapproved) {
                 let posts = [];
                 snapshot.forEach((data) => {
                     const post = data.val();
+                    post.id = data.key;
                     if (only_approved) {
                         if (post.approved) posts.push(data.val());
                     } else if (only_unapproved) {
@@ -271,9 +272,7 @@ function getPosts(category, amount, offset, only_approved, only_unapproved) {
                     return b.postTime - a.postTime
                 });
                 return posts.slice(offset);
-            }).catch((error) => {
-                return undefined;
-            })
+            }).catch(e => undefined);
 }
 
 async function getPostsByCategory (category, offset=0, amount=5) {
@@ -297,19 +296,18 @@ async function getPostsForUser(user, offset = 0, amount = 5) {
     return posts.slice(offset, offset+amount);
 }
 // Gets posts where the author is the specified user
-function getPostsByUser(user) {
-    return (
-        postsRef.orderByChild('author').equalTo(user.email).once("value")
+function getPostsByUser(user, approved_only) {
+    return postsRef.orderByChild('author').equalTo(user.email).once("value")
             .then((snapshot) => {
                 let posts = [];
-                snapshot.forEach((data) => {
-                    posts.push(data.val());
-                })
+                snapshot.forEach(data => {
+                    const post = data.val();
+                    if (!approved_only || post.approved) 
+                        posts.push(data.val());
+                });
                 return posts.reverse();
-            }).catch((error) => {
-                return undefined;
-            })
-    )
+            }).catch(e => undefined)
+    
 }
 
 async function searchPosts(query, bulletin) {
@@ -356,7 +354,7 @@ async function addCategory(req, newCategory) {
     const user = await getUser(req);
 
     // Get snapshot referencing user, edit values, then update.
-    await usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", function(snapshot) {
+    await usersRef.orderByChild('email').equalTo(user.email).limitToLast(1).once("value", snapshot => {
         const val = snapshot.val();
         const userID = Object.keys(val)[0];
         if (val[userID].categories == undefined) val[userID].categories = {};

@@ -10,7 +10,7 @@
                 <p><%= attachment %></p>
             <% }); %>
         <% } %>
-        
+         
         <button onclick="approvePost(<%= JSON.stringify(post) %>)">Approve Post</button>
     <% } if (post.approved && post.attachments != false && post.attachments != undefined) { %>
         <% post.attachments.forEach(function(attachment) { %>
