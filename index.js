@@ -111,7 +111,7 @@ app.get("/profile/:userEmail", db.auth, async (req, res) => {
         user: user,
         profile: profile,
         posts: posts,
-        categories: newCategories, 
+        categories: categories, 
     });
 });
 
@@ -125,7 +125,7 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
 
 app.post("/api/profile/removeCategory", db.auth, async (req, res) => {
     const category = req.body.category;
-    if (newCategory === undefined) return;
+    if (category === undefined) return;
 
     await db.removeCategory(req, category);
     res.status(200).json({});
