@@ -99,7 +99,7 @@ app.get("/profile/:userEmail", db.auth, async (req, res) => {
     if (profile === undefined) return res.status(404).send('None such user.');
     
     // Get posts by user
-    const posts = await db.getPostsByUser(profile);
+    const posts = await db.getPostsByUser(profile, true);
 
     // Get categories available to add. 
     const categories = Object.keys(await db.getCategories());
@@ -120,7 +120,7 @@ app.post("/api/profile/addCategory", db.auth, async (req, res) => {
     if (newCategory === undefined) return;
 
     await db.addCategory(req, newCategory);
-    res.status(200).json({});
+    res.status(200);
 });
 
 app.post("/api/profile/removeCategory", db.auth, async (req, res) => {
@@ -205,7 +205,6 @@ app.get("/api/posts/get", db.auth, async (req, res) => {
 });
 
 app.get("/api/posts/get-unapproved", db.auth, async (req, res) => {
-    console.log(req.query);
     const offset = Number(req.query.offset);
     const amount = Number(req.query.amount);
     const posts = await db.getPosts(req.query.category, amount, offset, false, true);
@@ -224,6 +223,17 @@ app.post("/api/posts/approve", db.auth, async (req, res) => {
     
     await db.approvePost(post);
     return res.status(200).send("ack");
+});
+
+app.post("/api/pin", db.auth, async (req, res) => {
+    const user = await db.getUser(req);
+    const post = req.query.postID;
+    const perms = user.admin || category_conf.moderators.includes(user.email);
+
+    if (!perms) 
+        return res.status(403).send("unauthorized");
+    if (!post) 
+        return res.status(403).send("no post specified");
 });
 
 app.listen(port, () => {

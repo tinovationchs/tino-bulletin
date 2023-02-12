@@ -31,17 +31,9 @@
         <% } %>
         <div style="width:60%">
         <h2> Posts: </h2>
-        <% if (user.admin) { %>
-            <% posts.forEach((post) => { %>
-                <%- include('./component/postView.ejs', {post: post, admin_view: true}) %>
-            <% }); %>
-        <% } else { %>
-            <% posts.forEach((post) => { %>
-                <% if (post.approved) { %>
-                <%- include('./component/postView.ejs', {post: post, admin_view: false}) %>
-                <% } %>
-            <% }); %>
-        <% } %>
+        <% posts.forEach(post => { %>
+            <%- include('./component/postView.ejs', {post: post, admin_view: false}) %>
+        <% }); %>
     </div>
         </div>
 
