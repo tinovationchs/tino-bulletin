@@ -15,8 +15,8 @@
             <% } %> 
             <p>You are currently viewing <b><%= bulletin %></b>.</p>
             
-            <% if (pin != undefined) { %> 
-                <h1> Pin: </h1>
+            <% if (typeof pin !== 'undefined') { %> 
+                <h1> Pinned </h1><button onclick="pinPost(<%= JSON.stringify({category: <%- bulletin %>, key: undefined})) %>">Unpin</button>
                 <%- include('./component/postView.ejs', {post: pin, admin_view: false}) %>
                 <hr>
             <% } %>

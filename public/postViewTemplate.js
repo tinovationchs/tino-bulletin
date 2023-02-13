@@ -16,7 +16,6 @@ const post_template = `
         <% } else { %>
             <button onclick="pinPost(<%= JSON.stringify(post) %>)">Pin Post</button>
         <% } %>
-        <button onclick="approvePost(<%= JSON.stringify(post) %>)">Approve Post</button>
     <% } %>
     
     <% if (post.approved && post.attachments != false && post.attachments != undefined) { %>
