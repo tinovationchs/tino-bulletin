@@ -36,7 +36,6 @@ app.get("/bulletins/:category", db.auth, async (req, res) => {
     const perms = user.admin || ((typeof category_conf.moderators === 'undefined') ? false : category_conf.moderators.includes(user.email));
     const pin = category_conf.pin ? await db.getPostByKey(category_conf.pin) : undefined;
 
-    console.log(pin);
     res.render("bulletin.ejs", { 
         user: user,
         moderator: perms,
@@ -49,6 +48,8 @@ app.get("/bulletins/mod/:category", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const category_conf = await db.getCategory(req.params.category);
     const perms = user.admin || category_conf.moderators.includes(user.email);
+    const pin = category_conf.pin ? await db.getPostByKey(category_conf.pin) : undefined;
+
     if (!perms) 
         res.status(403).send(`unauthorized for category '${req.params.category}'`);
     console.log(req.params.category);
@@ -56,7 +57,8 @@ app.get("/bulletins/mod/:category", db.auth, async (req, res) => {
         user: user,
         moderator: true,
         mod_view: true,
-        bulletin: req.params.category
+        bulletin: req.params.category,
+        pin: pin,
     });
 });
 
