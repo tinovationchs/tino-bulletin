@@ -34,13 +34,15 @@ app.get("/bulletins/:category", db.auth, async (req, res) => {
     const user = await db.getUser(req);
     const category_conf = await db.getCategory(req.params.category);
     const perms = user.admin || ((typeof category_conf.moderators === 'undefined') ? false : category_conf.moderators.includes(user.email));
-    console.log(req.params.category);
+    const pin = category_conf.pin ? await db.getPostByKey(category_conf.pin) : undefined;
 
+    console.log(pin);
     res.render("bulletin.ejs", { 
         user: user,
         moderator: perms,
         mod_view: false,
-        bulletin: req.params.category
+        bulletin: req.params.category,
+        pin: pin,
     });
 });
 app.get("/bulletins/mod/:category", db.auth, async (req, res) => {
@@ -214,26 +216,28 @@ app.get("/api/posts/get-unapproved", db.auth, async (req, res) => {
 app.post("/api/posts/approve", db.auth, async (req, res) => {
     //vulernable to attacks probably. fix later. probably check origin of requests
     const user = await db.getUser(req);
-    const post = req.body;
-    const category_conf = await db.getCategory(post.category);
+    const category_conf = await db.getCategory(req.body.category);
     const perms = user.admin || category_conf.moderators.includes(user.email);
 
     if (!perms) 
         return res.status(403).send("unauthorized");
     
-    await db.approvePost(post);
+    await db.approvePost(req.body.key);
     return res.status(200).send("ack");
 });
 
-app.post("/api/pin", db.auth, async (req, res) => {
+app.post("/api/posts/pin", db.auth, async (req, res) => {
     const user = await db.getUser(req);
-    const post = req.query.postID;
+    const category_conf = await db.getCategory(req.body.category);
     const perms = user.admin || category_conf.moderators.includes(user.email);
 
     if (!perms) 
         return res.status(403).send("unauthorized");
-    if (!post) 
+    if (!req.body.key)
         return res.status(403).send("no post specified");
+
+    db.pinPost(req.body.category, req.body.key);
+    return res.status(200).send("ack");
 });
 
 app.listen(port, () => {

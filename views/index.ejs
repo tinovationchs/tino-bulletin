@@ -24,7 +24,7 @@
         <script src="https://unpkg.com/ejs@3.1.6/ejs.min.js"></script>
         <script src="postViewTemplate.js"></script>
         <script>
-            const ADMIN_VIEW = <%- admin_view %>;
+            const ADMIN_VIEW = false;
             const fetchPosts = (params) => fetch("/api/posts/get?" + new URLSearchParams(params), {
                 method: "GET",
                 headers: {

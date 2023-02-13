@@ -15,6 +15,12 @@
             <% } %> 
             <p>You are currently viewing <b><%= bulletin %></b>.</p>
             
+            <% if (pin != undefined) { %> 
+                <h1> Pin: </h1>
+                <%- include('./component/postView.ejs', {post: pin, admin_view: false}) %>
+                <hr>
+            <% } %>
+
             <div id="feed"></div>
             <div id="loadingPost" class="postBox" ></div>
         
@@ -26,10 +32,10 @@
         </div>
         <script src="https://unpkg.com/ejs@3.1.6/ejs.min.js"></script>
         <script src="/postViewTemplate.js"></script>
-        
-         
+
+
         <script>
-            const ADMIN_VIEW = <%- mod_view %>;
+            const ADMIN_VIEW = <%- moderator %>;
             const fetchPosts = (params) => {
                 params.category = "<%- bulletin %>";
                 

@@ -151,15 +151,12 @@ async function validatePost(post) {
 }
 
 async function pushPost(post) {
-    {
-        console.log(post);
-        let err = await validatePost(post);
-        if (err != undefined) {
-            console.log("Invalid post. Error: ", err);
-            return err;
-        }
+    console.log(post);
+    let err = await validatePost(post);
+    if (err != undefined) {
+        console.log("Invalid post. Error: ", err);
+        return err;
     }
-
     let newPost = {
         title: post.title,
         text: post.text,
@@ -170,29 +167,22 @@ async function pushPost(post) {
         attachments: post.attachments,
         approved: false
     };
-
-    //todo: add "approved": false flag by default
-
     if (!newPost.title || !newPost.text) {
         return;
     }
-    //console.log(newPost)
-    //console.log("Pushed post: ", post);
-
     postsRef.push(newPost);
 }
 
-async function approvePost(post_content) {
-    console.log("approving post", post_content)
-    postsRef.once("value", function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            if (JSON.stringify(childSnapshot.val()) === JSON.stringify(post_content)) {
-                let new_post_content = childSnapshot.val();
-                new_post_content.approved = true;
-                childSnapshot.ref.update(new_post_content);
-            }
-        });
-    });
+async function approvePost(postKey) {
+    console.log("approving post", postKey)
+    return postsRef.child(postKey).once("value")
+        .then(data => {
+            if (data.key != postKey) return;
+            const post = data.val();
+            post.approved = true;
+            data.ref.update(post);
+        })
+        .catch(e => undefined)
 }
 
 async function getUserFromClaims(claims) {
@@ -229,6 +219,16 @@ async function getUser(req) {
     }
 }
 
+async function getPostByKey(key) {
+    return postsRef.child(key).once("value")
+        .then(data => {
+            const post = data.val();
+            post.key = data.key;
+            return post;
+        })
+        .catch(e => undefined);
+}
+
 // Fetches a list of posts.
 // NOTE: Draft function, later revisions may use an actual algorithm to tailor the posts
 //  to the user.
@@ -245,11 +245,11 @@ function getPosts(category, amount, offset, only_approved, only_unapproved) {
                 let posts = [];
                 snapshot.forEach((data) => {
                     const post = data.val();
-                    post.id = data.key;
+                    post.key = data.key;
                     if (only_approved) {
-                        if ( post.approved) posts.push(data.val());
+                        if ( post.approved) posts.push(post);
                     } else if (only_unapproved) {
-                        if (!post.approved) posts.push(data.val()); 
+                        if (!post.approved) posts.push(post); 
                     }
                 });
                 posts.sort((a, b) => b.postTime - a.postTime);
@@ -257,22 +257,21 @@ function getPosts(category, amount, offset, only_approved, only_unapproved) {
                 return posts.slice(offset);
             }).catch(e => undefined) :
         postsRef.orderByChild('postTime').limitToLast(offset + amount).once("value")
-            .then((snapshot) => {
+            .then(snapshot => {
                 let posts = [];
                 snapshot.forEach((data) => {
                     const post = data.val();
-                    post.id = data.key;
+                    post.key = data.key;
                     if (only_approved) {
-                        if (post.approved) posts.push(data.val());
+                        if (post.approved) posts.push(post);
                     } else if (only_unapproved) {
-                        if (!post.approved) posts.push(data.val()); 
+                        if (!post.approved) posts.push(post);
                     }
                 });
-                posts.sort(function(a, b) {
-                    return b.postTime - a.postTime
-                });
+                posts.sort((a, b) => b.postTime - a.postTime);
                 return posts.slice(offset);
-            }).catch(e => undefined);
+            })
+            .catch(e => undefined);
 }
 
 async function getPostsByCategory (category, offset=0, amount=5) {
@@ -298,34 +297,36 @@ async function getPostsForUser(user, offset = 0, amount = 5) {
 // Gets posts where the author is the specified user
 function getPostsByUser(user, approved_only) {
     return postsRef.orderByChild('author').equalTo(user.email).once("value")
-            .then((snapshot) => {
-                let posts = [];
-                snapshot.forEach(data => {
-                    const post = data.val();
-                    if (!approved_only || post.approved) 
-                        posts.push(data.val());
-                });
-                return posts.reverse();
-            }).catch(e => undefined)
-    
+        .then((snapshot) => {
+            let posts = [];
+            snapshot.forEach(data => {
+                const post = data.val();
+                if (!approved_only || post.approved) 
+                    posts.push(data.val());
+            });
+            return posts.reverse();
+        }).catch(e => undefined)
 }
 
+async function pinPost (category, postKey) {
+    categoriesRef.child(category).once("value").then(data => {
+        let category = data.val();
+        category.pin = postKey;
+        data.ref.update(category);
+    }).catch(e => undefined);
+}
 async function searchPosts(query, bulletin) {
     query = query.toLowerCase();
     let posts = [];
     if (bulletin) {
         let snapshot = await (postsRef.orderByChild('category').equalTo(bulletin)).once("value");
-        snapshot.forEach((data) => {
-            posts.push(data.val());
-        });
+        snapshot.forEach( data => posts.push(data.val()) );
         posts = posts.filter(function(post) {
             return (post.text.toLowerCase().includes(query) || post.title.toLowerCase().includes(query)) && post.approved;
         });
     } else {
         let snapshot = await postsRef.once("value");
-        snapshot.forEach((data) => {
-            posts.push(data.val());
-        });
+        snapshot.forEach( data => posts.push(data.val()) );
         posts = posts.filter(function(post) {
             return (post.text.toLowerCase().includes(query) || post.title.toLowerCase().includes(query)) && post.approved;
         });
@@ -335,17 +336,9 @@ async function searchPosts(query, bulletin) {
 
 async function getCategory(category) {
     return (
-    categoriesRef.once("value")
-        .then((snapshot) => {
-            let out;
-            snapshot.forEach( data => {
-                if (data.key == category)
-                    out = data.val();
-            });
-            return out;
-        }).catch((error) => {
-            return undefined;
-        })
+    categoriesRef.child(category).once("value")
+        .then(data => data.val())
+        .catch(e => undefined)
     );
 }
 
@@ -386,6 +379,7 @@ module.exports = {
     getUserByEmail: getUserByEmail,
 
     getPosts: getPosts,
+    getPostByKey: getPostByKey,
     getPostsByUser: getPostsByUser,
     getPostsByCategory: getPostsByCategory,
     getCategory: getCategory,
@@ -397,6 +391,7 @@ module.exports = {
 
     // DB setting & modifying 
     pushPost: pushPost,
+    pinPost: pinPost,
     createCategory: createCategory,
     getCategories: getCategories,
     approvePost: approvePost,

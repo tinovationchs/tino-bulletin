@@ -64,6 +64,22 @@ function shouldLoad () {
     return pos > lim;
 }
 
+async function pinPost (post) {
+    const res = await fetch('/api/posts/pin', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({category: post.category, key: post.key})
+    });
+    if (res.status != 200) {
+        alert("error on pin");
+    } else {
+        location.reload();
+    }
+}
+
 async function approvePost(post) {
     const res = await fetch('/api/posts/approve', {
         method: 'POST',
@@ -71,7 +87,7 @@ async function approvePost(post) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({category: post.category, key: post.key})
     });
     if (res.status != 200) {
         alert("error on approval");
