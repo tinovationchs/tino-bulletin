@@ -16,7 +16,7 @@
             <p>You are currently viewing <b><%= bulletin %></b>.</p>
             
             <% if (typeof pin !== 'undefined') { %> 
-                <h1> Pinned </h1><button onclick="pinPost(<%= JSON.stringify({category: <%- bulletin %>, key: undefined})) %>">Unpin</button>
+                <h1> Pinned </h1><button onclick="unpin()">Unpin</button>
                 <%- include('./component/postView.ejs', {post: pin, admin_view: false}) %>
                 <hr>
             <% } %>
@@ -35,6 +35,7 @@
 
 
         <script>
+            const CATEGORY = "<%- bulletin %>";
             const ADMIN_VIEW = <%- moderator %>;
             const fetchPosts = (params) => {
                 params.category = "<%- bulletin %>";
@@ -56,6 +57,6 @@
                 });
             }
         </script>
-        <script src="/infScroll.js"></script> 
+        <script src="/script.js"></script> 
     </body>
 </html>

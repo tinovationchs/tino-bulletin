@@ -235,8 +235,6 @@ app.post("/api/posts/pin", db.auth, async (req, res) => {
 
     if (!perms) 
         return res.status(403).send("unauthorized");
-    if (!req.body.key)
-        return res.status(403).send("no post specified");
 
     db.pinPost(req.body.category, req.body.key);
     return res.status(200).send("ack");
