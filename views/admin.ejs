@@ -5,15 +5,16 @@
         <%- include('./component/header.ejs', {user : user}) %>
     </head>
     <body>
-
-        <h2>Create new category:</h2>
-        <label for="category">Text:</label><br>
-        <input type="text" id="category" name="category"><br>
-        <textarea id="members" name="members" rows="4" cols="50"
-            placeholder="comma-separated list of member addresses. (to make public, leave blank)"></textarea><br>
-        <textarea id="moderators" name="moderators" rows="4" cols="50"
-            placeholder="comma-separated list of moderator addresses."></textarea><br>
-        <button onclick="createCategory()">Create Category</button>
+        <div id="main">
+          <h2>Create new category:</h2>
+          <label for="category">Category Name:</label><br>
+          <input type="text" id="category" name="category"><br>
+          <textarea id="members" name="members" rows="4" cols="50"
+              placeholder="comma-separated list of member addresses. (to make public, leave blank)"></textarea><br>
+          <textarea id="moderators" name="moderators" rows="4" cols="50"
+              placeholder="comma-separated list of moderator addresses."></textarea><br>
+          <button onclick="createCategory()">Create Category</button>
+        </div>
 
         <script>
             async function createCategory () {

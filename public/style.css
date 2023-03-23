@@ -59,8 +59,9 @@ body {
 
 #post-btn {
   position: fixed;
-  bottom: 12px;
-  right: 12px;
+  bottom: 30px;
+  right: 30px;
+  padding: 17px;
   align-items: center;
   z-index: 999;
   border-radius: 6px;
@@ -72,27 +73,38 @@ body {
 
 }
 
-@media screen and (max-width:999px){
+@media screen and (max-width: 999px){
   #search-btn{
-    display:none;
+    display: none;
   }
   #search-bar{
-    width:40%;
+    width: 40%;
   }
   #nav-wrapper{
-    margin-left:auto !important;
+    margin-left: auto !important;
   }
 }
 
-@media screen and (max-width:700px){
+@media screen and (max-width: 700px){
   #explore-dropdown{
-    display:none;
+    display: none;
+  }
+  #main {
+    width: 80%;
+  }
+  .navbar {
+    height: auto;
+  }
+  #post-btn {
+    bottom: 15px;
+    right: 15px;
+    padding: 10px;
   }
 }
 
-@media screen and (min-width:1200px){
+@media screen and (min-width: 1200px){
   #search-bar{
-    width:65%;
+    width: 65%;
   }
 }
 
