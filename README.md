@@ -1,66 +1,70 @@
-Language: Node.js
-Template Renderer: EJS
+# Tino Bulletin Forum 
+---
+## Overview & Features
+A bulletin/forum page for Cupertino High School, built by Tinovation.
+Post are attached to a specific "bulletin" and users will only see posts from subscribed bulletins.
+Posts must be approved by an admin or a moderator for the relevant bulletin before it is published to the users.
+Posting privileges to bulletins can be restricted by configuring it to be private. 
+Post searching is implemented.
 
-Packages to install:
-- express
-- cookie-parser
-- firebase-admin
-- EJS
-- dotenv
+--
+## Screenshots
 
-Environmental variables:
-- credentials
-- databaseURL
 
-Don't forget to change `config.json` to your own info. Please note that is for the frontend, not backend, so don't put any sensitive information there.
+---
+## Developer Notes
+### Tools
+- `Node.js` - Language used for implementing backend
+- `Express.js` - Node.js web hosting framework
+- `Bootstrap` - Frontend styling toolkit
+- `EJS` - JS templator 
+- `Firebase` - Development platform, used for its authentication service and realtime database
 
-To run,
+### Environmental Variables
+- Firebase Credentials
+- Database URL
 
-Install packages
+**Client access to `Firebase` must also be configured to the correct database. The Firebase realtime database will generate a `config.json` file to be served.**
+
+### Installation
 ```
-npm install
+npm install // Install necessary packages
+npm dev // Development hosting, run with nodemon
+npm start // Production Serve
 ```
 
-Then run backend
+### DB Schema
 ```
-node index.js
-```
-
-## DB Schema
-
-```
-categories : {
-    category_name : {
-        members: [string (email)] 
-        moderators: [string (email)]
-        private: bool
-    }
-    ...
+categories: {
+    <category-name> : {
+        members: [email] | undefined, // Undefined if public
+        moderators: [email] | undefined, // Undefined if public
+        private: bool,
+		pin: <post-id> | undefined
+    }, ...
 }
 
-posts : {
-    id : {
-        approved: bool
-        author: string (email)
-        authorName: string (username) 
-        attachments: [string (url)] | undefined
-        category: string 
-        postTime: int (unix milliseconds timestamp)
-        text: string
-        title: string
-    }
-    ...
+posts: {
+    <post-id>: {
+        approved: bool,
+        author: email,
+        authorName: username,
+        attachments: [url] | undefined,
+        category: string,
+        postTime: unix ms timestamp,
+        text: string,
+        title: string,
+    }, ...
 }
 
-users : {
-    id : {
+users: {
+    <user-id>: {
         admin: bool
         categories: {
-            string (category): true 
+            <category-name>: true 
         }
         email: string
         name: string
-    }
-    ...
+    }, ...
 }
 ```
