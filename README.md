@@ -9,9 +9,9 @@ Post searching is implemented.
 
 ## Screenshots
 ### Feed
-![image](https://github.com/beranki/loRAFire/blob/main/pictures/feed.png)
+![image](https://github.com/beranki/loRAFire/blob/main/screenshots/feed.png)
 ### Profile 
-![image](https://github.com/beranki/loRAFire/blob/main/pictures/profile.png)
+![image](https://github.com/beranki/loRAFire/blob/main/screenshots/profile.png)
 
 ---
 
