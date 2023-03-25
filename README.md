@@ -1,5 +1,5 @@
 # Tino Bulletin Forum 
----
+
 ## Overview & Features
 A bulletin/forum page for Cupertino High School, built by Tinovation.
 Post are attached to a specific "bulletin" and users will only see posts from subscribed bulletins.
@@ -7,12 +7,16 @@ Posts must be approved by an admin or a moderator for the relevant bulletin befo
 Posting privileges to bulletins can be restricted by configuring it to be private. 
 Post searching is implemented.
 
---
 ## Screenshots
-
+### Feed
+![image](https://github.com/beranki/loRAFire/blob/main/pictures/feed.png)
+### Profile 
+![image](https://github.com/beranki/loRAFire/blob/main/pictures/profile.png)
 
 ---
+
 ## Developer Notes
+
 ### Tools
 - `Node.js` - Language used for implementing backend
 - `Express.js` - Node.js web hosting framework
