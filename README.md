@@ -12,7 +12,8 @@ Post searching is implemented.
 ![image](https://github.com/downloadablecontent/Bulletin-Backend/blob/main/screenshots/feed.png)
 ### Profile 
 ![image](https://github.com/downloadablecontent/Bulletin-Backend/blob/main/screenshots/profile.png)
-
+### Mobile
+![image](https://i.imgur.com/uBKv7LZ.png)
 ---
 
 ## Developer Notes
